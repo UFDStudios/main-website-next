@@ -1,6 +1,8 @@
 import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
+import Navbar from "./components/navbar"
+import Footer from "./components/footer"
 
 export const metadata: Metadata = {
   title: "UFD - Your Company Name",
@@ -14,7 +16,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-main min-h-screen">
+        <Navbar />
+        <main className="pt-[8rem]">{children}</main>
+        <Footer />
+      </body>
     </html>
   )
 }

@@ -1,3 +1,4 @@
+import ContactForm from "@/app/contact/_components/contact-form"
 import Image from "next/image"
 // import ContactForm from "@/components/contact-form/ContactForm"
 
@@ -39,8 +40,8 @@ const SectionSeven = () => {
           />
         </div>
       </div>
-      <div className="md:mr-12 p-10 bg-gray-800 bg-opacity-50 justify-center">
-        {/* <ContactForm /> */}
+      <div className="md:mr-12 p-10 bg-gray-800/70 bg-opacity-20 justify-center">
+        <ContactForm />
       </div>
     </div>
   )
