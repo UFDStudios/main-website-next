@@ -5,8 +5,8 @@ import Navbar from "./components/navbar"
 import Footer from "./components/footer"
 
 export const metadata: Metadata = {
-  title: "UFD - Your Company Name",
-  description: "Your company description",
+  title: "UFD - Studios",
+  description: "Level Up Your Gaming Experience",
 }
 
 export default function RootLayout({
