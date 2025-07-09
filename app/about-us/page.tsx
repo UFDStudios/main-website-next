@@ -6,7 +6,6 @@ import Footer from "../components/footer";
 const AboutUs = () => {
   return (
     <div className="w-full bg-main text-white p-2 overflow-x-hidden">
-      <Navbar />
       {/* Hero Section */}
       <div className="relative w-full min-h-screen flex flex-col lg:flex-row">
         {/* Left Section - Full width on mobile, half on desktop */}

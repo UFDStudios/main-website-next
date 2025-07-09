@@ -16,7 +16,6 @@ const Careers = () => {
 
   return (
     <div className="bg-main" >
-      <Navbar />
       {/* Employee Testimonials */}
       <div className="w-full h-full text-white px-6 py-12 flex flex-col items-center mt-16">
         <h2 className="text-neon-green text-center text-5xl font-bold mb-12">
