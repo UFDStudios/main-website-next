@@ -205,7 +205,6 @@ const Careers = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };
