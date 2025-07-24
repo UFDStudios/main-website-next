@@ -1,84 +1,78 @@
-"use client"
-import { useState } from "react"
-import type React from "react"
+"use client";
+import { useState } from "react";
 
 interface FormErrors {
-  name?: string
-  email?: string
-  message?: string
+  name?: string;
+  email?: string;
+  message?: string;
 }
 
 const ContactForm = () => {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [message, setMessage] = useState("")
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [successMessage, setSuccessMessage] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = (): FormErrors => {
-    const tempErrors: FormErrors = {}
-    if (!name.trim()) tempErrors.name = "Name is required"
+    const tempErrors: FormErrors = {};
+    if (!name.trim()) tempErrors.name = "Name is required";
     if (!email.trim()) {
-      tempErrors.email = "Email is required"
+      tempErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      tempErrors.email = "Email is not valid"
+      tempErrors.email = "Email is not valid";
     }
-    if (!message.trim()) tempErrors.message = "Message is required"
-    return tempErrors
-  }
+    if (!message.trim()) tempErrors.message = "Message is required";
+    return tempErrors;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const tempErrors = validate()
+    e.preventDefault();
+    const tempErrors = validate();
 
     if (Object.keys(tempErrors).length === 0) {
-      setIsSubmitting(true)
-      setErrors({})
+      setIsSubmitting(true);
+      setErrors({});
+      setSuccessMessage("");
 
       try {
-        const data = {
-          service_id: "service_8h7s0d8",
-          template_id: "template_nx7lvhn",
-          user_id: "jfhLuQVpjBIW389w3",
-          template_params: { name, email, message },
-        }
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("message", message);
 
-        const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        const response = await fetch("https://formspree.io/f/myzperyp", {
           method: "POST",
+          body: formData,
           headers: {
-            "Content-Type": "application/json",
+            Accept: "application/json",
           },
-          body: JSON.stringify(data),
-        })
+        });
 
         if (response.ok) {
-          setSuccessMessage("Message Sent Successfully!")
-          setName("")
-          setEmail("")
-          setMessage("")
-          setErrors({})
+          setSuccessMessage("Message Sent Successfully!");
+          setName("");
+          setEmail("");
+          setMessage("");
 
-          // Clear success message after 5 seconds
           setTimeout(() => {
-            setSuccessMessage("")
-          }, 5000)
+            setSuccessMessage("");
+          }, 5000);
         } else {
-          const errorMessage = await response.text()
-          console.error(`Error: ${errorMessage}`)
-          setErrors({ message: "Failed to send message. Please try again." })
+          setErrors({ message: "Failed to send message. Please try again." });
         }
       } catch (error) {
-        console.error(error)
-        setErrors({ message: "Failed to send message. Please try again." })
+        console.error(error);
+        setErrors({ message: "Failed to send message. Please try again." });
       } finally {
-        setIsSubmitting(false)
+        setIsSubmitting(false);
       }
     } else {
-      setErrors(tempErrors)
-      setSuccessMessage("")
+      setErrors(tempErrors);
+      setSuccessMessage("");
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
@@ -149,7 +143,7 @@ const ContactForm = () => {
         )}
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default ContactForm
+export default ContactForm;
