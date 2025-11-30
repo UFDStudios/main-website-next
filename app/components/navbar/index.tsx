@@ -18,6 +18,10 @@ const links = [
     path: "/about-us",
   },
   {
+    title: "Portfolio",
+    path: "/portfolio",
+  },
+  {
     title: "Careers",
     path: "/careers",
   },
