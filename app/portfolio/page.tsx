@@ -397,7 +397,7 @@ function PortfolioSection() {
         </h1>
 
         <p className="mt-3 lg:mt-5 text-lg md:text-xl lg:text-2xl xl:text-3xl text-white/90">
-          Building games that players love to play.
+          Building games that players love to play. 
         </p>
         <p className="text-lg md:text-xl lg:text-2xl xl:text-3xl text-white/90">
           High-quality experiences. Lasting engagement.
@@ -435,12 +435,24 @@ const AboutUs = () => {
   return (
         <div className="mx-auto max-w-[96rem]">
           <div >
-            <PortfolioSection />
+            {/* <PortfolioSection /> */}
+            <div className="text-center mb-15">
+              <h1 className="mt-10 text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold">
+                <span className="text-neon-green">"</span>
+                <span className="text-white">Our </span>
+                <span className="text-neon-green">Portfolio</span>
+                <span className="text-neon-green">"</span>
+              </h1>
+
+              <p className="mt-3 lg:mt-5 text-lg md:text-xl lg:text-2xl xl:text-3xl text-white/90">
+                Building games that players love to play. High-quality experiences. Lasting engagement.
+              </p>
+            </div>
 
             {/* Sections */}
             <div className="ml-10 space-y-20">
               {portfolioData.map((project, index) => (
-                <div key={index} className="border-b border-gray-800 pb-16">
+                <div key={index} className="border-b border-gray-800">
 
                   <h3 className="text-5xl font-bold mb-5">{project.title}</h3>
                   <strong className="font-semibold text-white text-3xl block mb-2 ml-10">Game Description: </strong>
