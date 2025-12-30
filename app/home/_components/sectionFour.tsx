@@ -6,8 +6,8 @@ const SectionFour = () => {
           <span className="text-neon-green">How</span> we work?
         </h1>
         <p className="md:w-[50%] px-6 text-foreground text-2xl mt-4">
-          "Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement to
-          the gaming journey of the client....more
+          We operate as a seamless extension of your team. Our agile development process emphasizes transparency, 
+          rapid prototyping, and data-informed iteration, guiding your project from MVP to scalable live ops and continuous growth.
         </p>
       </div>
     </div>

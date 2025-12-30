@@ -16,27 +16,27 @@ const SectionThree = () => {
 
   const content: ServiceContent[] = [
     {
-      title: "Game design",
+      title: "Game Design",
       title2: " & Content",
-      text: `"Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement to the gaming journey of the client Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement to the gaming journey of the client....more`,
+      text: `Our game design philosophy centers on player retention. We craft compelling core loops, balanced progression systems, and engaging content that hooks players, utilizing UA analytics and live ops insights to optimize fun and monetization.`,
       image: "/images/ourServices/design.png",
     },
     {
       title: "Quality",
       title2: "Assurance",
-      text: `"Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement to the gaming journey of the client Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement to the gaming journey of the client....more`,
+      text: `Our rigorous game testing and QA processes guarantee a polished, bug-free experience across all devices. We focus on performance, usability, and stability to protect your reputation and ensure positive player reviews at launch.`,
       image: "/images/ourServices/quality.png",
     },
     {
       title: "Creative ",
       title2: "Marketing",
-      text: `"Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement to the gaming journey of the client Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement to the gaming journey of the client....more`,
+      text: `We don't just build games; we launch them successfully. Our creative marketing services cover user acquisition (UA) strategy, ASO (App Store Optimization), creative asset production, and community management to maximize your game's visibility and installs.`,
       image: "/images/ourServices/marketing.png",
     },
     {
       title: "Game",
       title2: "Engineering",
-      text: `"Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement to the gaming journey of the client Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement to the gaming journey of the client....more`,
+      text: `Our game engineering team builds scalable, high-performance backends and smooth client-side code for iOS and Android. We ensure technical excellence, stability, and seamless integration of SDKs for UA, analytics, and monetization.`,
       image: "/images/ourServices/engineering.png",
     },
   ]
@@ -56,12 +56,6 @@ const SectionThree = () => {
           <span className="border-b-2 border-foreground">Our</span> <span className="text-neon-green">Services</span>
           <span className="text-neon-green">"</span>
         </h1>
-        <div className="mt-5 md:w-[60%]">
-          <p className="flex justify-start lg:text-left lg:px-20 text-foreground text-xl text-center px-5">
-            "Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement
-            to the gaming journey of the client....more"
-          </p>
-        </div>
       </div>
       <div>
         <div className="w-full flex justify-center mt-12">

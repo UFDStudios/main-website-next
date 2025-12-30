@@ -1,12 +1,11 @@
 import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
-import Navbar from "./components/navbar"
-import Footer from "./components/footer"
+import LayoutContent from "./components/LayoutContent" 
 
 export const metadata: Metadata = {
-  title: "UFD - Studios",
-  description: "Level Up Your Gaming Experience",
+  title: "UFD Studios | Craft High Retention Mobile Games",
+  description: "UFD Studios is a premier mobile game development company. We specialize in high-retention game design, game development, 3D/2D art, and data-driven marketing to launch successful titles.",
 }
 
 export default function RootLayout({
@@ -17,9 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-main min-h-screen">
-        <Navbar />
-        <main className="pt-[8rem]">{children}</main>
-        <Footer />
+        <LayoutContent>
+          {children}
+        </LayoutContent>
       </body>
     </html>
   )
