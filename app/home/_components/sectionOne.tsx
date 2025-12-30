@@ -13,8 +13,8 @@ const SectionOne = () => {
           Experience<span className="text-neon-green">"</span>
         </h1>
         <p className="flex justify-start lg:text-left lg:px-20 text-foreground mt-20 text-2xl text-center px-5">
-          "Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement to
-          the gaming journey of the client....more"
+          UFD Studios is a premier mobile game development company. We specialize in high-retention game design, 
+          game development, 3D/2D art, and data-driven marketing to launch successful titles.
         </p>
       </div>
       <div className="relative justify-center items-center mr-10 hidden lg:flex">

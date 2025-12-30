@@ -11,8 +11,8 @@ const SectionTwo = () => {
       </div>
       <div className="lg:w-[40%] mt-5">
         <p className="flex justify-start lg:text-left lg:px-20 text-foreground text-2xl text-center">
-          "Level Up Your Gaming Experience" is a tagline designed to convey a promise of enhancement and improvement to
-          the gaming journey of the client....more"
+          Explore our portfolio of successful mobile games. Each title showcases our expertise in high-retention game design, 
+          player engagement mechanics, and live ops strategies that drive long-term success.
         </p>
       </div>
       {/* GAME CARDS */}

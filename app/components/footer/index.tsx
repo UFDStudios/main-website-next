@@ -13,16 +13,8 @@ const Footer = () => {
           </p>
           <div>
             <div className="flex items-center mb-2">
-              {/* <span className="material-icons text-red-600 mr-2">
-                location_on
-              </span>
-              <span>San Francisco, CA 94111, USA</span> */}
             </div>
             <div className="flex items-center">
-              {/* <span className="material-icons text-red-600 mr-2">
-                location_on
-              </span>
-              <span>Devsinc Tower, Lahore, PK</span> */}
             </div>
           </div>
         </div>
@@ -100,7 +92,7 @@ const Footer = () => {
 
       <div className="border-t border-gray-700 mt-8 pt-4 text-center">
         <p>
-          © 2024 <span className="text-neon-green">UFD Studios</span>. All Rights Reserved
+          © 2026 <span className="text-neon-green">UFD Studios</span>. All Rights Reserved
         </p>
       </div>
     </footer>

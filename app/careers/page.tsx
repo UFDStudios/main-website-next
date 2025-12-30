@@ -190,7 +190,12 @@ const Careers = () => {
                   <h3 className="font-bold text-xl">{job.title}</h3>
                   <p className="text-gray-400">Remote, Full Time</p>
                 </div>
-                <button className="border border-neon-green text-center rounded-full md:w-56 md:h-12 flex justify-between items-center gap-2 hover:bg-green-600 hover:text-black transition-all duration-300 px-4">
+                <a
+                  href="https://www.linkedin.com/company/ufd-studios"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-neon-green text-center rounded-full md:w-56 md:h-12 flex justify-between items-center gap-2 hover:bg-green-600 hover:text-black transition-all duration-300 px-4"
+                >
                   <span></span>
                   <span className="font-semibold">Apply</span>
                   <Image
@@ -199,7 +204,7 @@ const Careers = () => {
                     width={58}
                     height={26}
                   />
-                </button>
+                </a>
               </div>
             ))}
           </div>
