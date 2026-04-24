@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Key, useEffect, useMemo, useRef, useState } from "react";
 
 type Project = typeof portfolioData[number];
@@ -45,8 +46,6 @@ const portfolioData = [
       "/images/portfolio/whisper_house/group2.png",
       "/images/portfolio/whisper_house/group3.png",
       "/images/portfolio/whisper_house/group4.png",
-      "/images/portfolio/ludo_multiplayer/fps1.mp4",
-      "/images/portfolio/ludo_multiplayer/fps2.mp4",
     ],
     mainImage: "/images/portfolio/whisper_house/banner.png",
   },
@@ -610,9 +609,14 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
 };
 
 const Portfolio = () => {
+  
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [activeGenre, setActiveGenre] = useState<string>("All");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const genreFromUrl = searchParams.get("genre") || "All";
+  const [activeGenre, setActiveGenre] = useState<string>(genreFromUrl);
 
   // 🔹 Unique genres (clean + sorted)
   const allGenres = useMemo(() => {
@@ -649,6 +653,10 @@ const Portfolio = () => {
     scrollRef.current?.scrollBy({ left: 200, behavior: "smooth" });
   };
 
+  useEffect(() => {
+    setActiveGenre(genreFromUrl);
+  }, [genreFromUrl]);
+
   return (
     <>
       <section className="mx-auto max-w-[96rem] px-6 pb-20">
@@ -672,7 +680,19 @@ const Portfolio = () => {
           <div ref={scrollRef} className="flex gap-4 overflow-x-auto scrollbar-hide justify-center min-w-full">
             {allGenres.map((genre) => (
               <button
-                key={genre} onClick={() => setActiveGenre(genre)}
+                key={genre} 
+                //onClick={() => setActiveGenre(genre)}
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams.toString());
+
+                  if (genre === "All") {
+                    params.delete("genre");
+                  } else {
+                    params.set("genre", genre);
+                  }
+
+                  router.push(`${pathname}?${params.toString()}`);
+                }}
                 className={`
                   px-8 py-3 text-lg rounded-full border whitespace-nowrap transition-all duration-200
                   ${
