@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Key, useEffect, useMemo, useRef, useState } from "react";
+//import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { Key, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Project = typeof portfolioData[number];
 
@@ -609,14 +609,40 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
 };
 
 const Portfolio = () => {
-  
   const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [activeGenre, setActiveGenre] = useState<string>("All");
   const scrollRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const genreFromUrl = searchParams.get("genre") || "All";
-  const [activeGenre, setActiveGenre] = useState<string>(genreFromUrl);
+
+  // 🔹 Sync URL with genre filter
+  useEffect(() => {
+    // Get genre from URL on initial load or browser back/forward
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlGenre = urlParams.get('genre') || 'All';
+    
+    // Ensure the genre exists in our list, fallback to "All"
+    if (allGenres.includes(urlGenre)) {
+      setActiveGenre(urlGenre);
+    } else {
+      setActiveGenre('All');
+    }
+  }, []); // Only run once on mount
+
+  // 🔹 Update URL when genre changes
+  const updateUrl = useCallback((genre: string) => {
+    const url = new URL(window.location.href); // .href gives string
+    if (genre === 'All') {
+      url.searchParams.delete('genre');
+    } else {
+      url.searchParams.set('genre', genre);
+    }
+    window.history.replaceState({}, '', url);
+  }, []);
+
+  // 🔹 Handle genre click with URL update
+  const handleGenreClick = useCallback((genre: string) => {
+    setActiveGenre(genre);
+    updateUrl(genre);
+  }, [updateUrl]);
 
   // 🔹 Unique genres (clean + sorted)
   const allGenres = useMemo(() => {
@@ -653,10 +679,6 @@ const Portfolio = () => {
     scrollRef.current?.scrollBy({ left: 200, behavior: "smooth" });
   };
 
-  useEffect(() => {
-    setActiveGenre(genreFromUrl);
-  }, [genreFromUrl]);
-
   return (
     <>
       <section className="mx-auto max-w-[96rem] px-6 pb-20">
@@ -680,19 +702,8 @@ const Portfolio = () => {
           <div ref={scrollRef} className="flex gap-4 overflow-x-auto scrollbar-hide justify-center min-w-full">
             {allGenres.map((genre) => (
               <button
-                key={genre} 
-                //onClick={() => setActiveGenre(genre)}
-                onClick={() => {
-                  const params = new URLSearchParams(searchParams.toString());
-
-                  if (genre === "All") {
-                    params.delete("genre");
-                  } else {
-                    params.set("genre", genre);
-                  }
-
-                  router.push(`${pathname}?${params.toString()}`);
-                }}
+                key={genre}
+                onClick={() => handleGenreClick(genre)}  // 👈 Updated handler
                 className={`
                   px-8 py-3 text-lg rounded-full border whitespace-nowrap transition-all duration-200
                   ${

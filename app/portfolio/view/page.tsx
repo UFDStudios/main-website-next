@@ -1,5 +1,4 @@
 "use client"
-export const dynamic = "force-dynamic";
 
 import Logo from '@/app/components/logo'
 import PortfolioPage from '../../components/PortfolioPage'

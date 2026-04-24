@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import PortfolioPage from '../components/PortfolioPage'
 
 export default function Page() 
