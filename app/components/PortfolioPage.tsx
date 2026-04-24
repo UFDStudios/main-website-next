@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-//import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Key, useEffect, useMemo, useRef, useState } from "react";
 
 type Project = typeof portfolioData[number];
@@ -612,12 +612,11 @@ const Portfolio = () => {
   
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [activeGenre, setActiveGenre] = useState<string>("All");
-  /* const router = useRouter();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const genreFromUrl = searchParams.get("genre") || "All";
-  const [activeGenre, setActiveGenre] = useState<string>(genreFromUrl); */
+  const [activeGenre, setActiveGenre] = useState<string>(genreFromUrl);
 
   // 🔹 Unique genres (clean + sorted)
   const allGenres = useMemo(() => {
@@ -654,9 +653,9 @@ const Portfolio = () => {
     scrollRef.current?.scrollBy({ left: 200, behavior: "smooth" });
   };
 
-  /* useEffect(() => {
+  useEffect(() => {
     setActiveGenre(genreFromUrl);
-  }, [genreFromUrl]); */
+  }, [genreFromUrl]);
 
   return (
     <>
@@ -682,8 +681,8 @@ const Portfolio = () => {
             {allGenres.map((genre) => (
               <button
                 key={genre} 
-                onClick={() => setActiveGenre(genre)}
-                /* onClick={() => {
+                //onClick={() => setActiveGenre(genre)}
+                onClick={() => {
                   const params = new URLSearchParams(searchParams.toString());
 
                   if (genre === "All") {
@@ -693,7 +692,7 @@ const Portfolio = () => {
                   }
 
                   router.push(`${pathname}?${params.toString()}`);
-                }} */
+                }}
                 className={`
                   px-8 py-3 text-lg rounded-full border whitespace-nowrap transition-all duration-200
                   ${
