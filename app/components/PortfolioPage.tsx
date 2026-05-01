@@ -220,7 +220,6 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
   }, [project.mainImage, project.images]);
 
   useEffect(() => {
-    // When the media changes (arrow click), show loader until it finishes loading.
     setMediaLoading(true);
   }, [currentIndex]);
 
