@@ -1,8 +1,41 @@
 import { PrismaClient, MediaKind } from "@prisma/client";
+import "dotenv/config";
+import fs from "node:fs";
+import path from "node:path";
 
 const prisma = new PrismaClient();
 
-const portfolioData = [
+type PortfolioSeedItem = {
+  title: string;
+  description: string;
+  genres: string[];
+  images: string[];
+  mainImage: string;
+};
+
+const portfolioData: PortfolioSeedItem[] = [
+  {
+    title: "Tate Fighter - 2d Multiplayer Shooter Game",
+    description: `Tate Fighter is a competitive 2D multiplayer deathmatch game combining fast-paced shooting, precise platforming, and real-time online combat. Built with Unity and Photon PUN 2, the game supports mobile and PC with optimized controls and performance.
+
+		- Fast-paced online deathmatch gameplay
+		- AI bots for solo practice or filler opponents
+		- Diverse weapon system: guns, melee, grenades
+		- Character customization and unlockable cosmetics
+		- Power-ups, item pickups, jump pads & portals
+		- Real-time leaderboard with kill/death/score tracking
+		- With Art, emotes, and modular code for customization
+    `,
+    genres: ["Shooter", "Multiplayer", "Action", "Competitive"],
+    images: [
+      "/images/portfolio/tate_fighter/group1.png",
+      "/images/portfolio/tate_fighter/group2.png",
+      "/images/portfolio/tate_fighter/group3.png",
+      "/images/portfolio/tate_fighter/group4.png",
+    ],
+    // Note: local file on disk is "banner .png" (with a space)
+    mainImage: "/images/portfolio/tate_fighter/banner .png",
+  },
   {
     title: "Ludo Multiplayer Game",
     description: `Ludo Multiplayer is a mobile board game built in Unity (C#) for Android & iOS, offering classic Ludo gameplay with modern multiplayer features.
@@ -324,23 +357,105 @@ const portfolioData = [
     ],
     mainImage: "/images/portfolio/pixel_adventure/banner.png",
   },
-] as const;
+];
+
+function assertEnv() {
+  const missing = ["IMAGEKIT_PRIVATE_KEY", "IMAGEKIT_URL_ENDPOINT"].filter(
+    (k) => !process.env[k]
+  );
+  if (missing.length) {
+    throw new Error(`Missing env vars: ${missing.join(", ")} (set them in .env)`);
+  }
+}
+
+function publicUrlToLocalFile(publicUrl: string) {
+  if (!publicUrl.startsWith("/")) return null;
+  return path.join(process.cwd(), "public", publicUrl.replaceAll("/", path.sep));
+}
+
+async function uploadFileToImageKit(localFilePath: string, destPath: string) {
+  const file = await fs.promises.readFile(localFilePath);
+  const fileName = path.basename(localFilePath);
+
+  const privateKey = process.env.IMAGEKIT_PRIVATE_KEY ?? "";
+  const endpoint = process.env.IMAGEKIT_URL_ENDPOINT ?? "";
+  const uploadEndpoint = "https://upload.imagekit.io/api/v1/files/upload";
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
+
+  try {
+    const form = new FormData();
+    // Node's type defs for BlobPart don't always accept Buffer, so convert explicitly.
+    form.set("file", new Blob([new Uint8Array(file)]), fileName);
+    form.set("fileName", fileName);
+    form.set("folder", destPath);
+    form.set("useUniqueFileName", "false");
+
+    const res = await fetch(uploadEndpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${privateKey}:`).toString("base64")}`,
+      },
+      body: form as any,
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`ImageKit upload failed (${res.status}): ${text.slice(0, 500)}`);
+    }
+
+    const json = (await res.json()) as { url?: string };
+    if (!json.url) throw new Error("ImageKit upload returned no url");
+    if (!json.url.startsWith(endpoint)) {
+      console.warn(`[warn] Uploaded url doesn't match IMAGEKIT_URL_ENDPOINT: ${json.url}`);
+    }
+    return json.url;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 async function main() {
+  assertEnv();
+
   // idempotent for dev
   await prisma.projectGenre.deleteMany();
   await prisma.media.deleteMany();
   await prisma.project.deleteMany();
   await prisma.genre.deleteMany();
 
+  const uploadCache = new Map<string, string>(); // publicUrl -> imagekitUrl
+
   for (const p of portfolioData) {
     const project = await prisma.project.create({
       data: {
         title: p.title,
         description: p.description,
+        // will be replaced with ImageKit URL below
         mainImage: p.mainImage,
       },
     });
+
+    const folder = `/portfolio/${project.id}`;
+
+    // Upload and replace mainImage
+    if (project.mainImage.startsWith("/")) {
+      const local = publicUrlToLocalFile(project.mainImage);
+      if (!local || !fs.existsSync(local)) {
+        console.warn(`[warn] mainImage file missing: ${project.mainImage} (skipping upload)`);
+      } else {
+        const cached = uploadCache.get(project.mainImage);
+        const mainImageUrl = cached ?? (await uploadFileToImageKit(local, folder));
+        if (!cached) uploadCache.set(project.mainImage, mainImageUrl);
+
+        await prisma.project.update({
+          where: { id: project.id },
+          data: { mainImage: mainImageUrl },
+        });
+      }
+    }
 
     for (const name of p.genres) {
       const genre = await prisma.genre.upsert({
@@ -355,7 +470,20 @@ async function main() {
     }
 
     for (let i = 0; i < p.images.length; i++) {
-      const url = p.images[i];
+      const sourceUrl = p.images[i];
+      let url = sourceUrl;
+
+      if (sourceUrl.startsWith("/")) {
+        const local = publicUrlToLocalFile(sourceUrl);
+        if (!local || !fs.existsSync(local)) {
+          console.warn(`[warn] media file missing: ${sourceUrl} (keeping original url)`);
+        } else {
+          const cached = uploadCache.get(sourceUrl);
+          url = cached ?? (await uploadFileToImageKit(local, folder));
+          if (!cached) uploadCache.set(sourceUrl, url);
+        }
+      }
+
       await prisma.media.create({
         data: {
           projectId: project.id,

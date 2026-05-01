@@ -143,6 +143,7 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
             <div ref={containerRef} className="flex gap-4 overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth">
               {orderedMedia.map((media, index) => {
                 const isVideo = media.toLowerCase().endsWith(".mp4");
+                const isRemote = /^https?:\/\//i.test(media);
                 const isPortrait = portraits.includes(media);
                 const portraitMarginClasses = isPortrait ? `${index === 0 ? "lg:ml-36" : ""} ${index === orderedMedia.length - 1 ? "lg:mr-36" : ""}`: "";
 
@@ -162,6 +163,7 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
                         width={500}
                         height={500}
                         onLoad={(e) => handleImageLoad(index, e)}
+                        unoptimized={isRemote}
                         className={`${ isPortrait ? "h-full w-auto object-contain" : "h-full w-full object-cover"} rounded-lg`}
                       />
                     )}
@@ -185,17 +187,24 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
           </button>
 
           {/* Centered image */}
+          {(() => {
+            const src = orderedMedia[lightboxIndex];
+            const isRemote = /^https?:\/\//i.test(src);
+            return (
           <Image
-            src={orderedMedia[lightboxIndex]}
+            src={src}
             alt=""
             width={1200}
             height={1200}
+            unoptimized={isRemote}
             className={`object-contain ${
               portraits.includes(orderedMedia[lightboxIndex])
                 ? "max-h-[calc(100%-160px)]" // Add top/bottom margin for portrait
                 : "max-h-full"
             }`}
           />
+            );
+          })()}
         </div>
       )}
     </div>
@@ -225,6 +234,7 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
 
   const currentMedia = allMedia[currentIndex] || "";
   const isVideo = currentMedia.toLowerCase().endsWith(".mp4");
+  const isRemote = /^https?:\/\//i.test(currentMedia);
 
   return (
     <>
@@ -292,6 +302,7 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
               width={800}
               height={450}
               onLoad={() => setMediaLoading(false)}
+              unoptimized={isRemote}
               className={`max-h-full max-w-full object-contain rounded-lg cursor-pointer transition-[filter] duration-200 ${
                 mediaLoading ? "blur-sm" : "blur-0"
               }`}
