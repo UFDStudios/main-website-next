@@ -348,7 +348,26 @@ const Portfolio = () => {
         setLoading(true);
         setLoadError(null);
         const res = await fetch("/api/portfolio", { cache: "no-store" });
-        if (!res.ok) throw new Error(`Failed to load portfolio (${res.status})`);
+        if (!res.ok) {
+          let serverMessage = "";
+          try {
+            const contentType = res.headers.get("content-type") || "";
+            if (contentType.includes("application/json")) {
+              const body = (await res.json()) as unknown;
+              if (body && typeof body === "object" && "error" in body) {
+                const maybeError = (body as { error?: unknown }).error;
+                if (typeof maybeError === "string") serverMessage = maybeError;
+              }
+            } else {
+              serverMessage = (await res.text()).trim();
+            }
+          } catch {
+            // ignore parse errors
+          }
+
+          const suffix = serverMessage ? `: ${serverMessage}` : "";
+          throw new Error(`Failed to load portfolio (${res.status})${suffix}`);
+        }
         const data = (await res.json()) as PortfolioProject[];
         if (!cancelled) setProjects(Array.isArray(data) ? data : []);
       } catch (e) {

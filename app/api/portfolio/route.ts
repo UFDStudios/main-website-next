@@ -1,24 +1,41 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
-  const projects = await prisma.project.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      genres: { include: { genre: true } },
-      media: { orderBy: { sortOrder: "asc" } },
-    },
-  });
+export const runtime = "nodejs";
 
-  return NextResponse.json(
-    projects.map((p) => ({
-      id: p.id,
-      title: p.title,
-      description: p.description,
-      mainImage: p.mainImage,
-      genres: p.genres.map((g) => g.genre.name),
-      images: p.media.map((m) => m.url),
-    }))
-  );
+export async function GET() {
+  try {
+    const projects = await prisma.project.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        genres: { include: { genre: true } },
+        media: { orderBy: { sortOrder: "asc" } },
+      },
+    });
+
+    return NextResponse.json(
+      projects.map((p) => ({
+        id: p.id,
+        title: p.title,
+        description: p.description,
+        mainImage: p.mainImage,
+        genres: p.genres.map((g) => g.genre.name),
+        images: p.media.map((m) => m.url),
+      }))
+    );
+  } catch (err) {
+    console.error("[api/portfolio] GET failed", err);
+    const message =
+      err instanceof Error
+        ? err.message
+        : "Unknown error";
+
+    return NextResponse.json(
+      process.env.NODE_ENV === "production"
+        ? { error: "Portfolio API failed" }
+        : { error: "Portfolio API failed", detail: message },
+      { status: 500 }
+    );
+  }
 }
 
