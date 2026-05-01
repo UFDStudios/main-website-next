@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String         @id @default(cuid())
+  title       String
+  description String
+  mainImage   String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  genres ProjectGenre[]
+  media  Media[]
+}
+
+model Genre {
+  id   String @id @default(cuid())
+  name String @unique
+
+  projects ProjectGenre[]
+}
+
+model ProjectGenre {
+  projectId String
+  genreId   String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  genre   Genre   @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, genreId])
+  @@index([genreId])
+}
+
+enum MediaKind {
+  IMAGE
+  VIDEO
+}
+
+model Media {
+  id        String    @id @default(cuid())
+  projectId String
+  url       String
+  kind      MediaKind @default(IMAGE)
+  sortOrder Int       @default(0)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, sortOrder])
+}
+
