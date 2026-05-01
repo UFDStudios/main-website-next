@@ -68,7 +68,7 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
 
   const orderedMedia = [...portraits, ...landscapes, ...videos];
 
-  // Scroll
+  // Scroll for the carousel
   const scrollLeft = () => {
     if (!containerRef.current) return;
     const newScroll = Math.max(scrollX - scrollAmount, 0);
