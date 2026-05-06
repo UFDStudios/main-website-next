@@ -6,15 +6,16 @@ const SectionOne = () => {
     <div className="w-full grid lg:grid-cols-2 mt-10">
       <div className="flex flex-col text-center lg:mt-32 lg:p-14">
         <h1 className="text-foreground font-extrabold md:text-7xl text-4xl">
-          <span className="text-neon-green">"</span>Level Up Your
+          <span className="text-neon-green">"</span>Full-Cycle
         </h1>
-        <h1 className="text-neon-green font-extrabold md:text-7xl text-4xl">Gaming</h1>
+        <h1 className="text-neon-green font-extrabold md:text-7xl text-4xl">Mobile Game</h1>
         <h1 className="text-foreground font-extrabold md:text-7xl text-4xl">
-          Experience<span className="text-neon-green">"</span>
+          Development<span className="text-neon-green">"</span>
         </h1>
         <p className="flex justify-start lg:text-left lg:px-20 text-foreground mt-20 text-2xl text-center px-5">
-          UFD Studios is a premier mobile game development company. We specialize in high-retention game design, 
-          game development, 3D/2D art, and data-driven marketing to launch successful titles.
+          With a track record of 250+ successful titles, UFD Studios provides studio-level
+          execution for startups and funded teams. We turn ambitious concepts into global mobile
+          hits.
         </p>
       </div>
       <div className="relative justify-center items-center mr-10 hidden lg:flex">

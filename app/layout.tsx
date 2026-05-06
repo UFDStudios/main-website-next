@@ -4,8 +4,8 @@ import "./globals.css"
 import LayoutContent from "./components/LayoutContent" 
 
 export const metadata: Metadata = {
-  title: "UFD Studios | Craft High Retention Mobile Games",
-  description: "UFD Studios is a premier mobile game development company. We specialize in high-retention game design, game development, 3D/2D art, and data-driven marketing to launch successful titles.",
+  title: "UFD Studios | Professional Mobile Game Development Agency",
+  description: "UFD Studios: Full-cycle mobile game production and Agile development for startups. Specializing in Unity & Unreal with 250+ delivered titles. All-in-one success packages available.",
 }
 
 export default function RootLayout({

@@ -5,14 +5,16 @@ const SectionTwo = () => {
     <div className="mt-8 mx-8">
       <div className="flex text-center md:text-start lg:mt-32 lg:p-14">
         <h1 className="text-foreground font-extrabold md:text-7xl text-4xl">
-          <span className="text-neon-green">"</span>Our Games
+          <span className="text-neon-green">"</span>
+          <span className="border-b-2 border-foreground">Our</span> <span className="text-neon-green">Games</span>
           <span className="text-neon-green">"</span>
         </h1>
       </div>
       <div className="lg:w-[40%] mt-5">
         <p className="flex justify-start lg:text-left lg:px-20 text-foreground text-2xl text-center">
-          Explore our portfolio of successful mobile games. Each title showcases our expertise in high-retention game design, 
-          player engagement mechanics, and live ops strategies that drive long-term success.
+          A Proven Portfolio of High-Retention Mobile Success. Our 250+ delivered projects
+          across Unity, Unreal, and Godot demonstrate mastery in player engagement and
+          scalable LiveOps strategies.
         </p>
       </div>
       {/* GAME CARDS */}

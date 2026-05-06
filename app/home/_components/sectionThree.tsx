@@ -7,6 +7,7 @@ import Reveal from "@/app/components/reveal"
 interface ServiceContent {
   title: string
   title2: string
+  title3: string
   text: string
   image: string
 }
@@ -18,25 +19,36 @@ const SectionThree = () => {
     {
       title: "Game Design",
       title2: " & Content",
-      text: `Our game design philosophy centers on player retention. We craft compelling core loops, balanced progression systems, and engaging content that hooks players, utilizing UA analytics and live ops insights to optimize fun and monetization.`,
+      title3: "Player Psychology & Monetization Loops",
+      text: `We design games that don't just entertain but retain. By utilizing behavioral psychological triggers and balanced economy loops, we maximize long-term player engagement.`,
       image: "/images/ourServices/design.png",
     },
     {
       title: "Quality",
       title2: "Assurance",
-      text: `Our rigorous game testing and QA processes guarantee a polished, bug-free experience across all devices. We focus on performance, usability, and stability to protect your reputation and ensure positive player reviews at launch.`,
+      title3: "Cross-Device Optimization & Bug-Free Launches",
+      text: `We perform rigorous device-farm testing to ensure 60 FPS performance across the hardware spectrum, eliminating fragmentation issues before they reach your players.`,
       image: "/images/ourServices/quality.png",
     },
     {
       title: "Creative ",
       title2: "Marketing",
-      text: `We don't just build games; we launch them successfully. Our creative marketing services cover user acquisition (UA) strategy, ASO (App Store Optimization), creative asset production, and community management to maximize your game's visibility and installs.`,
+      title3: "Data-Driven User Acquisition & LTV Growth",
+      text: `We bridge the gap between development and growth. Using real-time analytics, we optimize your CPI (Cost Per Install) and scale your LTV (Lifetime Value) through targeted creative assets.`,
       image: "/images/ourServices/marketing.png",
     },
     {
       title: "Game",
       title2: "Engineering",
-      text: `Our game engineering team builds scalable, high-performance backends and smooth client-side code for iOS and Android. We ensure technical excellence, stability, and seamless integration of SDKs for UA, analytics, and monetization.`,
+      title3: "Multi-Engine Mastery (Unity, Unreal, Godot, Cocos, Construct 3)",
+      text: `From high-fidelity console ports in Unreal to lightweight, high-performance mobile builds in Unity or Godot, our technical architecture is built for stability and scale.`,
+      image: "/images/ourServices/engineering.png",
+    },
+    {
+      title: "The All-in-One",
+      title2: "Success Package",
+      title3: "Complete Vertical Production Integration",
+      text: `This is the unified combination of our four core pillars (Design, Engineering, QA, and Marketing). Designed for funded startups and ambitious publishers, this package provides a market-ready product by ensuring the monetization design matches the engineering constraints and the UA creative strategy. It removes the friction of managing multiple vendors, transferring all technical and creative risk to our expert team.`,
       image: "/images/ourServices/engineering.png",
     },
   ]
@@ -53,7 +65,7 @@ const SectionThree = () => {
       <div className="md:flex text-center md:text-start lg:mt-32 lg:p-14">
         <h1 className="text-foreground font-extrabold md:text-7xl text-4xl">
           <span className="text-neon-green">"</span>
-          <span className="border-b-2 border-foreground">Our</span> <span className="text-neon-green">Services</span>
+          <span className="border-b-2 border-foreground">Our Services &</span> <span className="text-neon-green">Specialized Packages</span>
           <span className="text-neon-green">"</span>
         </h1>
       </div>
@@ -76,6 +88,13 @@ const SectionThree = () => {
                 {content[activeTab].title2}
                 <span className="text-neon-green">"</span>
               </h2>
+            </div>
+            <div className="ml-8 mt-6 lg:px-20">
+              <p className="text-white md:text-3xl text-2xl font-bold text-center">
+                <span className="text-neon-green">"</span>
+                {content[activeTab].title3}
+                <span className="text-neon-green">"</span>
+              </p>
             </div>
             <div className="ml-8 mt-2 lg:px-20">
               <p className="text-white md:text-2xl text-xl text-justify">{content[activeTab].text}</p>
@@ -122,14 +141,14 @@ const SectionThree = () => {
               </div>
               <span
                 className={`${
-                  activeTab === index ? "text-neon-green md:text-2xl ml-20" : "text-gray-400 md:text-xl text-base ml-20"
+                  activeTab === index ? "text-neon-green md:text-2xl ml-16" : "text-gray-400 md:text-xl text-base ml-16"
                 }`}
               >
                 "{item.title}
               </span>
               <span
                 className={`text-xl ${
-                  activeTab === index ? "text-foreground md:text-2xl ml-20" : "text-gray-400 md:text-xl text-base ml-20"
+                  activeTab === index ? "text-foreground md:text-2xl ml-16" : "text-gray-400 md:text-xl text-base ml-16"
                 }`}
               >
                 {item.title2} <span className="text-neon-green">"</span>
