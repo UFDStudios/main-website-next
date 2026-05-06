@@ -67,6 +67,7 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
   });
 
   const orderedMedia = [...portraits, ...landscapes, ...videos];
+  const lightboxMedia = useMemo(() => orderedMedia.filter((m) => !m.toLowerCase().endsWith(".mp4")), [orderedMedia]);
 
   // Scroll for the carousel
   const scrollLeft = () => {
@@ -85,7 +86,26 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
   };
 
   const canScrollLeft = scrollX > 0;
-  const canScrollRight = containerRef.current && scrollX < containerRef.current.scrollWidth - containerRef.current.clientWidth - 5;
+  const canScrollRight =
+    containerRef.current && scrollX < containerRef.current.scrollWidth - containerRef.current.clientWidth - 5;
+
+  const goLightboxLeft = useCallback(() => {
+    setLightboxIndex((i) => {
+      if (i === null) return i;
+      const len = lightboxMedia.length;
+      if (len <= 1) return i;
+      return (i - 1 + len) % len;
+    });
+  }, [lightboxMedia.length]);
+
+  const goLightboxRight = useCallback(() => {
+    setLightboxIndex((i) => {
+      if (i === null) return i;
+      const len = lightboxMedia.length;
+      if (len <= 1) return i;
+      return (i + 1) % len;
+    });
+  }, [lightboxMedia.length]);
 
   return (
     <div  className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-start justify-center pt-10 px-4 overflow-y-auto"
@@ -126,14 +146,16 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
 
           <div className="relative">
             {canScrollLeft && (
-              <button onClick={scrollLeft}
+              <button
+                onClick={scrollLeft}
                 className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/70 hover:bg-black text-white text-2xl rounded-full z-10"
               >
                 ‹
               </button>
             )}
             {canScrollRight && (
-              <button onClick={scrollRight}
+              <button
+                onClick={scrollRight}
                 className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/70 hover:bg-black text-white text-2xl rounded-full z-10"
               >
                 ›
@@ -149,13 +171,18 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
 
                 return (
                   <div
-                    key={index} onClick={() => !isVideo && setLightboxIndex(index)}
+                    key={index}
+                    onClick={() => {
+                      if (isVideo) return;
+                      const lbIndex = lightboxMedia.indexOf(media);
+                      if (lbIndex >= 0) setLightboxIndex(lbIndex);
+                    }}
                     className={`flex-shrink-0 ${isPortrait ? 'h-64' : 'h-32 lg:h-64'} bg-black flex items-center justify-center rounded-lg shadow-md cursor-pointer
                       ${isPortrait ? "mx-auto max-w-[350px] w-auto" : "w-[250px] lg:w-[350px]"} ${portraitMarginClasses}
                     `}
                   >
                     {isVideo ? (
-                      <video src={media} controls className={`${isPortrait ? 'h-64' : 'h-32 lg:h-64'} w-full object-cover rounded-lg`}/>
+                      <video src={media} controls className={`${isPortrait ? 'h-64' : 'h-32 lg:h-64'} w-full object-contain rounded-lg`}/>
                     ) : (
                       <Image
                         src={media}
@@ -164,7 +191,7 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
                         height={500}
                         onLoad={(e) => handleImageLoad(index, e)}
                         unoptimized={isRemote}
-                        className={`${ isPortrait ? "h-full w-auto object-contain" : "h-full w-full object-cover"} rounded-lg`}
+                        className={`${ isPortrait ? "h-full w-auto object-contain" : "h-full w-full object-contain"} rounded-lg`}
                       />
                     )}
                   </div>
@@ -186,9 +213,37 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
             ×
           </button>
 
+          {/* Left/Right arrows for lightbox */}
+          <button
+            disabled={lightboxMedia.length <= 1}
+            onClick={(e) => {
+              e.stopPropagation();
+              goLightboxLeft();
+            }}
+            className={`absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/70 text-white text-2xl rounded-full border border-white z-50 ${
+              lightboxMedia.length <= 1 ? "opacity-40 pointer-events-none" : "hover:bg-black"
+            }`}
+            aria-label="Previous image"
+          >
+            ‹
+          </button>
+          <button
+            disabled={lightboxMedia.length <= 1}
+            onClick={(e) => {
+              e.stopPropagation();
+              goLightboxRight();
+            }}
+            className={`absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/70 text-white text-2xl rounded-full border border-white z-50 ${
+              lightboxMedia.length <= 1 ? "opacity-40 pointer-events-none" : "hover:bg-black"
+            }`}
+            aria-label="Next image"
+          >
+            ›
+          </button>
+
           {/* Centered image */}
           {(() => {
-            const src = orderedMedia[lightboxIndex];
+            const src = lightboxMedia[lightboxIndex];
             const isRemote = /^https?:\/\//i.test(src);
             return (
           <Image
@@ -198,7 +253,7 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
             height={1200}
             unoptimized={isRemote}
             className={`object-contain ${
-              portraits.includes(orderedMedia[lightboxIndex])
+              portraits.includes(src)
                 ? "max-h-[calc(100%-160px)]" // Add top/bottom margin for portrait
                 : "max-h-full"
             }`}
@@ -224,11 +279,11 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
   }, [currentIndex]);
 
   const goLeft = () => {
-    if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
+    setCurrentIndex((i) => (allMedia.length ? (i - 1 + allMedia.length) % allMedia.length : 0));
   };
 
   const goRight = () => {
-    if (currentIndex < allMedia.length - 1) setCurrentIndex(currentIndex + 1);
+    setCurrentIndex((i) => (allMedia.length ? (i + 1) % allMedia.length : 0));
   };
 
   const currentMedia = allMedia[currentIndex] || "";
@@ -246,36 +301,34 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
         {/* Carousel Image/Video Area */}
         <div className="relative w-full h-[220px] bg-black flex items-center justify-center">
           {/* Left Arrow */}
-          {currentIndex > 0 && (
-            <button
-              disabled={mediaLoading}
-              onClick={(e) => {
-                e.stopPropagation();
-                goLeft();
-              }}
-              className={`absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/70 text-white text-lg rounded-full border border-white z-10 ${
-                mediaLoading ? "opacity-40 pointer-events-none" : "hover:bg-black"
-              }`}
-            >
-              ‹
-            </button>
-          )}
+          <button
+            disabled={mediaLoading || allMedia.length <= 1}
+            onClick={(e) => {
+              e.stopPropagation();
+              goLeft();
+            }}
+            className={`absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/70 text-white text-lg rounded-full border border-white z-10 ${
+              mediaLoading || allMedia.length <= 1 ? "opacity-40 pointer-events-none" : "hover:bg-black"
+            }`}
+            aria-label="Previous media"
+          >
+            ‹
+          </button>
 
           {/* Right Arrow */}
-          {currentIndex < allMedia.length - 1 && (
-            <button
-              disabled={mediaLoading}
-              onClick={(e) => {
-                e.stopPropagation();
-                goRight();
-              }}
-              className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/70 text-white text-lg rounded-full border border-white z-10 ${
-                mediaLoading ? "opacity-40 pointer-events-none" : "hover:bg-black"
-              }`}
-            >
-              ›
-            </button>
-          )}
+          <button
+            disabled={mediaLoading || allMedia.length <= 1}
+            onClick={(e) => {
+              e.stopPropagation();
+              goRight();
+            }}
+            className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/70 text-white text-lg rounded-full border border-white z-10 ${
+              mediaLoading || allMedia.length <= 1 ? "opacity-40 pointer-events-none" : "hover:bg-black"
+            }`}
+            aria-label="Next media"
+          >
+            ›
+          </button>
 
           {/* Loader overlay while switching media */}
           {mediaLoading && (
@@ -458,15 +511,21 @@ const Portfolio = () => {
 
           {/* 🔥 GENRE BAR */}
           {!loading && !loadError && (
-            <div className="relative mb-10">
+            <div className="relative mb-10 overflow-visible">
 
               {/* Left Arrow */}
-              <button onClick={scrollLeft} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black text-white w-10 h-10 rounded-full">
+              <button
+                onClick={scrollLeft}
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black text-white w-10 h-10 rounded-full"
+              >
                 ‹
               </button>
 
               {/* Scroll Container */}
-              <div ref={scrollRef} className="flex gap-4 overflow-x-auto scrollbar-hide justify-center min-w-full">
+              <div
+                ref={scrollRef}
+                className="flex gap-4 overflow-x-auto scrollbar-hide justify-start sm:justify-center min-w-full px-12"
+              >
                 {allGenres.map((genre) => (
                   <button
                     key={genre}
@@ -486,7 +545,10 @@ const Portfolio = () => {
               </div>
 
               {/* Right Arrow */}
-              <button onClick={scrollRight} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black text-white w-10 h-10 rounded-full">
+              <button
+                onClick={scrollRight}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black text-white w-10 h-10 rounded-full"
+              >
                 ›
               </button>
             </div>

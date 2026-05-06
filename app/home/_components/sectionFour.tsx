@@ -6,8 +6,9 @@ const SectionFour = () => {
           <span className="text-neon-green">How</span> we work?
         </h1>
         <p className="md:w-[50%] px-6 text-foreground text-2xl mt-4">
-          We operate as a seamless extension of your team. Our agile development process emphasizes transparency, 
-          rapid prototyping, and data-informed iteration, guiding your project from MVP to scalable live ops and continuous growth.
+          We act as your strategic technical partner using an Agile-Sprints methodology.
+          Our pipeline moves rapidly from prototyping to performance tuning, delivering iterative
+          builds every 2 weeks to ensure your MVP scales seamlessly.
         </p>
       </div>
     </div>
