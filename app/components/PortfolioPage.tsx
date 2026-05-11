@@ -24,14 +24,22 @@ const SectionSpinner = ({ label = "Loading" }: { label?: string }) => {
 };
 
 const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => void }) => {
-  const images = project.images || [];
+  const images = useMemo(() => {
+    const galleryImages: string[] = Array.isArray(project.images) ? project.images : [];
+    const mainImage: string | undefined = project.mainImage;
+    if (!mainImage) return galleryImages;
+    // Place mainImage first, but avoid duplicating it if it's already in the gallery list.
+    return [mainImage, ...galleryImages.filter((img) => img !== mainImage)];
+  }, [project.mainImage, project.images]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [orientations, setOrientations] = useState<boolean[]>([]);
+  const [loadedMedia, setLoadedMedia] = useState<Set<string>>(new Set());
   const [scrollX, setScrollX] = useState(0);
 
   // For fullscreen lightbox
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [lightboxLoaded, setLightboxLoaded] = useState(false);
   const scrollAmount = 350;
 
   // Disable body scroll when modal is open
@@ -42,9 +50,24 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
 
   useEffect(() => {
     setOrientations(new Array(images.length).fill(false));
+    setLoadedMedia(new Set());
   }, [images]);
 
-  const handleImageLoad = (index: number, e: React.SyntheticEvent<HTMLImageElement>) => {
+  // Reset lightbox loader whenever the active lightbox image changes.
+  useEffect(() => {
+    setLightboxLoaded(false);
+  }, [lightboxIndex]);
+
+  const markMediaLoaded = (media: string) => {
+    setLoadedMedia(prev => {
+      if (prev.has(media)) return prev;
+      const next = new Set(prev);
+      next.add(media);
+      return next;
+    });
+  };
+
+  const handleImageLoad = (index: number, media: string, e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.target as HTMLImageElement;
     const isLandscape = img.naturalWidth > img.naturalHeight;
     setOrientations(prev => {
@@ -52,6 +75,7 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
       updated[index] = isLandscape;
       return updated;
     });
+    markMediaLoaded(media);
   };
 
   // Separate media
@@ -168,6 +192,7 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
                 const isRemote = /^https?:\/\//i.test(media);
                 const isPortrait = portraits.includes(media);
                 const portraitMarginClasses = isPortrait ? `${index === 0 ? "lg:ml-36" : ""} ${index === orderedMedia.length - 1 ? "lg:mr-36" : ""}`: "";
+                const isLoaded = loadedMedia.has(media);
 
                 return (
                   <div
@@ -177,21 +202,35 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
                       const lbIndex = lightboxMedia.indexOf(media);
                       if (lbIndex >= 0) setLightboxIndex(lbIndex);
                     }}
-                    className={`flex-shrink-0 ${isPortrait ? 'h-64' : 'h-32 lg:h-64'} bg-black flex items-center justify-center rounded-lg shadow-md cursor-pointer
+                    className={`relative flex-shrink-0 ${isPortrait ? 'h-64' : 'h-32 lg:h-64'} bg-black flex items-center justify-center rounded-lg shadow-md cursor-pointer overflow-hidden
                       ${isPortrait ? "mx-auto max-w-[350px] w-auto" : "w-[250px] lg:w-[350px]"} ${portraitMarginClasses}
                     `}
                   >
+                    {!isLoaded && (
+                      <div className="absolute inset-0 flex items-center justify-center z-[5] pointer-events-none">
+                        <div className="h-6 w-6 rounded-full border-2 border-white/25 border-t-neon-green animate-spin" />
+                      </div>
+                    )}
                     {isVideo ? (
-                      <video src={media} controls className={`${isPortrait ? 'h-64' : 'h-32 lg:h-64'} w-full object-contain rounded-lg`}/>
+                      <video
+                        src={media}
+                        controls
+                        onLoadedData={() => markMediaLoaded(media)}
+                        className={`${isPortrait ? 'h-64' : 'h-32 lg:h-64'} w-full object-contain rounded-lg transition-opacity duration-200 ${
+                          isLoaded ? "opacity-100" : "opacity-0"
+                        }`}
+                      />
                     ) : (
                       <Image
                         src={media}
                         alt=""
                         width={500}
                         height={500}
-                        onLoad={(e) => handleImageLoad(index, e)}
+                        onLoad={(e) => handleImageLoad(index, media, e)}
                         unoptimized={isRemote}
-                        className={`${ isPortrait ? "h-full w-auto object-contain" : "h-full w-full object-contain"} rounded-lg`}
+                        className={`${ isPortrait ? "h-full w-auto object-contain" : "h-full w-full object-contain"} rounded-lg transition-opacity duration-200 ${
+                          isLoaded ? "opacity-100" : "opacity-0"
+                        }`}
                       />
                     )}
                   </div>
@@ -246,18 +285,28 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
             const src = lightboxMedia[lightboxIndex];
             const isRemote = /^https?:\/\//i.test(src);
             return (
-          <Image
-            src={src}
-            alt=""
-            width={1200}
-            height={1200}
-            unoptimized={isRemote}
-            className={`object-contain ${
-              portraits.includes(src)
-                ? "max-h-[calc(100%-160px)]" // Add top/bottom margin for portrait
-                : "max-h-full"
-            }`}
-          />
+              <>
+                {!lightboxLoaded && (
+                  <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+                    <div className="h-10 w-10 rounded-full border-2 border-white/25 border-t-neon-green animate-spin" />
+                  </div>
+                )}
+                <Image
+                  src={src}
+                  alt=""
+                  width={1200}
+                  height={1200}
+                  unoptimized={isRemote}
+                  onLoad={() => setLightboxLoaded(true)}
+                  className={`object-contain transition-opacity duration-200 ${
+                    lightboxLoaded ? "opacity-100" : "opacity-0"
+                  } ${
+                    portraits.includes(src)
+                      ? "max-h-[calc(100%-160px)]" // Add top/bottom margin for portrait
+                      : "max-h-full"
+                  }`}
+                />
+              </>
             );
           })()}
         </div>
