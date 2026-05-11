@@ -1,7 +1,7 @@
 "use client"
 
 import Logo from '@/app/components/logo'
-import PortfolioPage from '../../components/PortfolioPage'
+import PortfolioPage from '../../components/portfolio/PortfolioPage'
 
 export default function Page() 
 {
