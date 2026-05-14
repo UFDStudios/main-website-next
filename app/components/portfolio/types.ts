@@ -5,6 +5,8 @@ export type PortfolioProject = {
   longDescription: string;
   mainImage: string;
   youtubeUrl: string | null;
+  googlePlayLink: string | null;
+  appStoreLink: string | null;
   enableVideo: boolean;
   images: string[];
   genres: string[];

@@ -21,6 +21,8 @@ export async function GET() {
         longDescription: p.longDescription,
         mainImage: p.mainImage,
         youtubeUrl: p.youtubeUrl,
+        googlePlayLink: p.googlePlayLink,
+        appStoreLink: p.appStoreLink,
         enableVideo: p.enableVideo,
         genres: p.genres.map((g) => g.genre.name),
         images: p.media.map((m) => m.url),

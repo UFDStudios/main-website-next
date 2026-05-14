@@ -40,7 +40,7 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
   useEffect(() => {
     setOrientations({});
     setLoadedMedia(new Set());
-  }, [images, project.youtubeUrl, project.enableVideo]);
+  }, [images, project.youtubeUrl]);
 
   // Reset lightbox loader whenever the active lightbox image changes.
   useEffect(() => {
@@ -105,8 +105,8 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
     if (!embedSrc) return base;
 
     const yt: GalleryEntry = { key: `youtube:${embedSrc}`, kind: "youtube", embedSrc };
-    return project.enableVideo ? [yt, ...base] : [...base, yt];
-  }, [orderedMedia, project.youtubeUrl, project.enableVideo]);
+    return [yt, ...base];
+  }, [orderedMedia, project.youtubeUrl]);
 
   const portraitSet = useMemo(() => new Set(portraits), [portraits]);
   const lightboxMedia = useMemo(() => orderedMedia.filter((m) => !m.toLowerCase().endsWith(".mp4")), [orderedMedia]);
@@ -181,13 +181,53 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
             <p className="text-gray-300 whitespace-pre-line leading-relaxed">{project.longDescription}</p>
           </div>
 
-          <div className="flex flex-wrap gap-3 mb-4">
-            {project.genres.map((genre: string, i: Key | null | undefined) => (
-              <span key={i} className="border border-gray-700 px-4 py-2 rounded-md text-white">{genre}</span>
-            ))}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-3 mb-8">
+            <div className="flex min-w-0 flex-1 flex-wrap gap-3">
+              {project.genres.map((genre: string, i: Key | null | undefined) => (
+                <span key={i} className="border border-gray-700 px-4 py-2 rounded-md text-white">{genre}</span>
+              ))}
+            </div>
+            {(project.googlePlayLink?.trim() || project.appStoreLink?.trim()) && (
+              <div className="ml-auto flex flex-shrink-0 flex-wrap items-center justify-end gap-4">
+                {project.googlePlayLink?.trim() && (
+                  <a
+                    href={project.googlePlayLink.trim()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex rounded-lg overflow-hidden border border-gray-700 hover:border-neon-green focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon-green transition-colors"
+                    aria-label="Open on Google Play"
+                  >
+                    <Image
+                      src="/images/portfolio/googlePlay.png"
+                      alt="Get it on Google Play"
+                      width={180}
+                      height={54}
+                      className="h-12 w-auto object-contain"
+                    />
+                  </a>
+                )}
+                {project.appStoreLink?.trim() && (
+                  <a
+                    href={project.appStoreLink.trim()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex rounded-lg overflow-hidden border border-gray-700 hover:border-neon-green focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon-green transition-colors"
+                    aria-label="Download on the App Store"
+                  >
+                    <Image
+                      src="/images/portfolio/appStore.png"
+                      alt="Download on the App Store"
+                      width={180}
+                      height={54}
+                      className="h-12 w-auto object-contain"
+                    />
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
-          <h3 className="text-2xl font-bold text-white mb-4">Gallery</h3>
+          {/* <h3 className="text-2xl font-bold text-white mb-4">Gallery</h3> */}
 
           <div className="relative">
             {canScrollLeft && (
