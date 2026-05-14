@@ -3,15 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PortfolioModal from "./PortfolioModal";
 import ProjectCard from "./ProjectCard";
-
-type PortfolioProject = {
-  id: string;
-  title: string;
-  description: string;
-  mainImage: string;
-  images: string[];
-  genres: string[];
-};
+import type { PortfolioProject } from "./types";
 
 type Project = PortfolioProject;
 

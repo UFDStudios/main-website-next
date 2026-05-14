@@ -17,8 +17,11 @@ export async function GET() {
       projects.map((p) => ({
         id: p.id,
         title: p.title,
-        description: p.description,
+        shortDescription: p.shortDescription,
+        longDescription: p.longDescription,
         mainImage: p.mainImage,
+        youtubeUrl: p.youtubeUrl,
+        enableVideo: p.enableVideo,
         genres: p.genres.map((g) => g.genre.name),
         images: p.media.map((m) => m.url),
       }))

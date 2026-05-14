@@ -7,7 +7,8 @@ const prisma = new PrismaClient();
 
 type PortfolioSeedItem = {
   title: string;
-  description: string;
+  shortDescription: string;
+  longDescription: string;
   genres: string[];
   images: string[];
   mainImage: string;
@@ -16,7 +17,9 @@ type PortfolioSeedItem = {
 const portfolioData: PortfolioSeedItem[] = [
   {
     title: "Tate Fighter - 2d Multiplayer Shooter Game",
-    description: `Tate Fighter is a competitive 2D multiplayer deathmatch game combining fast-paced shooting, precise platforming, and real-time online combat. Built with Unity and Photon PUN 2, the game supports mobile and PC with optimized controls and performance.
+    shortDescription:
+      "Competitive 2D multiplayer deathmatch with fast shooting, platforming, and Photon PUN 2 online play.",
+    longDescription: `Tate Fighter is a competitive 2D multiplayer deathmatch game combining fast-paced shooting, precise platforming, and real-time online combat. Built with Unity and Photon PUN 2, the game supports mobile and PC with optimized controls and performance.
 
 		- Fast-paced online deathmatch gameplay
 		- AI bots for solo practice or filler opponents
@@ -38,7 +41,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Ludo Multiplayer Game",
-    description: `Ludo Multiplayer is a mobile board game built in Unity (C#) for Android & iOS, offering classic Ludo gameplay with modern multiplayer features.
+    shortDescription:
+      "Classic Ludo on Android and iOS with real-time multiplayer, ELO ranks, chat, and Firebase-backed stats.",
+    longDescription: `Ludo Multiplayer is a mobile board game built in Unity (C#) for Android & iOS, offering classic Ludo gameplay with modern multiplayer features.
 
       - Real-time multiplayer with Photon and matchmaking
       - ELO ranking system for competitive play
@@ -59,7 +64,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Whisper House - Mobile Horror Game",
-    description: `A first-person psychological horror game built in Unity, optimized for mobile with Firebase & AdMob integration. Players explore a haunted mansion, solve puzzles, and survive terrifying encounters.
+    shortDescription:
+      "First-person psychological horror in a haunted mansion—mobile FPS, inventory, AI enemies, and hiding.",
+    longDescription: `A first-person psychological horror game built in Unity, optimized for mobile with Firebase & AdMob integration. Players explore a haunted mansion, solve puzzles, and survive terrifying encounters.
 
       Core Systems:
       - Mobile FPS Controller (Joystick/Touch)
@@ -80,7 +87,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Dragon Dive - Endless Runner Game",
-    description: `Dragon Dive is a fast-paced 2D endless surfing game inspired by Alto’s Adventure, featuring smooth procedural terrain generation, trick combos, and dynamic environments.
+    shortDescription:
+      "2D endless surfing runner with procedural terrain, tricks, parallax, and day-night cycles on mobile.",
+    longDescription: `Dragon Dive is a fast-paced 2D endless surfing game inspired by Alto’s Adventure, featuring smooth procedural terrain generation, trick combos, and dynamic environments.
 
       Key Technical Features:
       - Procedural terrain & object generation for endless gameplay
@@ -99,7 +108,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Quad Racer - Typing Game",
-    description: `Quad Racer is a real-time typing-based racing game built in Unity for WebGL. Players control a quad bike that accelerates based on typing speed and accuracy, competing against AI opponents in a dynamic race environment.
+    shortDescription:
+      "WebGL typing racer—your quad speeds up with WPM and accuracy as you race AI on dynamic tracks.",
+    longDescription: `Quad Racer is a real-time typing-based racing game built in Unity for WebGL. Players control a quad bike that accelerates based on typing speed and accuracy, competing against AI opponents in a dynamic race environment.
 
       Technical Features:
       - Developed with Unity & C#
@@ -119,7 +130,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Jab Jab Boxing - Typing Game",
-    description: `A fun and interactive typing game where kids boost their typing speed and accuracy by fighting AI opponents in a boxing ring!
+    shortDescription:
+      "Browser boxing game where kids improve typing speed and accuracy against AI opponents in the ring.",
+    longDescription: `A fun and interactive typing game where kids boost their typing speed and accuracy by fighting AI opponents in a boxing ring!
 
       Key Features:
       - WebGL build – play directly in the browser
@@ -139,7 +152,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Chroma Pop: Match 3 Game",
-    description: `It's a Match 3 Game with the following features implemented in it:
+    shortDescription:
+      "Match-3 puzzle with a custom level editor, thousands of levels, AdMob, IAPs, Firebase, and ability VFX.",
+    longDescription: `It's a Match 3 Game with the following features implemented in it:
 
       - Custom level editor (With 1000 levels)
       - AdMob ads
@@ -158,7 +173,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Manor Mystery: Puzzle Adventure Quest",
-    description: `Uncover dark secrets in "Manor Mystery: Puzzle Adventure Quest." Step into the shoes of a detective whose wife and child have vanished in their 1920s home. Solve hidden-object puzzles, navigate haunted rooms, and break the curse of the hunted witch.
+    shortDescription:
+      "Detective hidden-object adventure in a 1920s manor—story, puzzles, Unity Timeline, and cutscenes.",
+    longDescription: `Uncover dark secrets in "Manor Mystery: Puzzle Adventure Quest." Step into the shoes of a detective whose wife and child have vanished in their 1920s home. Solve hidden-object puzzles, navigate haunted rooms, and break the curse of the hunted witch.
 
       This game includes:
       - A complete animated story
@@ -177,7 +194,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Circular Pong: Color Ball Game",
-    description: ` Circle Ping Pong game, with AdMob ads(Interstitial, Rewarded, Appopen, MREC, Banner), Firebase Sdk, Skin store, Spin wheel, and much more. `,
+    shortDescription:
+      "Arcade circular pong with AdMob placements, Firebase, skin store, spin wheel, and monetization stack.",
+    longDescription: ` Circle Ping Pong game, with AdMob ads(Interstitial, Rewarded, Appopen, MREC, Banner), Firebase Sdk, Skin store, Spin wheel, and much more. `,
     genres: ["Arcade", "Casual"],
     images: [
       "/images/portfolio/circular_pong/group1.png",
@@ -189,7 +208,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Nitro Racers: Multiplayer Car Racing Game",
-    description: `A Multiplayer Car Racing Game with Photon Fusion SDK integration. 
+    shortDescription:
+      "Photon Fusion multiplayer racing with lobby, matchmaking, maps, car customization, and IAP.",
+    longDescription: `A Multiplayer Car Racing Game with Photon Fusion SDK integration. 
       
       It has following key features:
       - Lobby system
@@ -209,7 +230,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "World Soccer 2025 - Soccer League Game",
-    description: `World Soccer 2025 is a fast-paced mobile soccer game delivering thrilling real-time action with intuitive touch controls.
+    shortDescription:
+      "Fast mobile soccer with touch controls, multiplayer or offline modes, and performance tuned for low-end devices.",
+    longDescription: `World Soccer 2025 is a fast-paced mobile soccer game delivering thrilling real-time action with intuitive touch controls.
 
       Technical Highlights:
       - Developed in Unity for iOS and Android
@@ -229,7 +252,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Pookie Park: Multiplayer Puzzle Game",
-    description:
+    shortDescription:
+      "Cute co-op action-puzzle for 2–8 players online or solo—keys, doors, and teamwork across unique levels.",
+    longDescription:
       "Pookie Park is a collaborative action-puzzle game that supports both single-player and online play for 2 to 8 players. A very cute 2 player game to play with your partner. It's the perfect game for couples, making it an ideal choice for fun, cooperative play with your partner. Solve mind bending puzzles, collect keys, and unlock doors to cross multiple unique levels. Each designed to test your logic, creativity, and teamwork skills!",
     genres: ["Platformer", "Casual", "Multiplayer", "Competitive", "Puzzle"],
     images: [
@@ -242,7 +267,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Solitaire Card Game",
-    description:
+    shortDescription:
+      "Classic patience solitaire—clear the board with strategy, simple rules, and relaxing single-player sessions.",
+    longDescription:
       "Solitaire Card Game is a classic single-player card challenge where you arrange shuffled cards into ordered stacks using strategy, patience, and a bit of luck. With simple rules and relaxing gameplay, it’s perfect for quick breaks or long sessions as you aim to clear the board and achieve the perfect win.",
     genres: ["Card", "Casual", "Realistic", "Offline"],
     images: [
@@ -255,7 +282,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Rolling Going Balls",
-    description:
+    shortDescription:
+      "3D rolling-ball runner—steer a speeding sphere over shifting platforms and obstacles for high scores.",
+    longDescription:
       "Rolling goinng balls is a 3d game. It is an addictive rolling-ball runner where you guide a speeding sphere across shifting platforms, sudden drops, and rising obstacles. Time your moves, keep your balance, and push for the highest score as the pace intensifies. Easy to pick up, hard to master, and endlessly fun.",
     genres: ["Adventure", "Hyper-Casual"],
     images: [
@@ -268,7 +297,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Linceo - 2d Space Endless Game",
-    description:
+    shortDescription:
+      "Arcade endless space flyer—dodge cosmic hazards, chase scores, and survive as speed ramps up.",
+    longDescription:
       "Linceo is a 2d Space Endless Game. It is a fast-paced arcade adventure where you guide your ship through an endless cosmic field filled with obstacles and challenges. Test your reflexes, collect points, and see how long you can survive as the speed ramps up. Simple controls, vibrant visuals, and addictive gameplay make Linceo perfect for quick, exciting sessions in outer space..",
     genres: ["Casual", "Stylized", "Science-fiction", "Space", "Offline"],
     images: [
@@ -281,7 +312,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Tennis Clash 3d Mobile Game",
-    description: `Tennis Clash 3D is a fast-paced mobile tennis game made in Unity (C#) for Android & iOS, featuring smooth physics, intuitive controls, and competitive multiplayer.
+    shortDescription:
+      "3D tennis on mobile with Photon 1v1 multiplayer, ELO, Firebase stats, shop, ads, and scalable visuals.",
+    longDescription: `Tennis Clash 3D is a fast-paced mobile tennis game made in Unity (C#) for Android & iOS, featuring smooth physics, intuitive controls, and competitive multiplayer.
 
       - Real-time 1v1 multiplayer with Photon, friend invites & chat
       - Leaderboards and ELO ranking system
@@ -301,7 +334,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Casino Slot Game",
-    description:
+    shortDescription:
+      "Themed slot experience with bonus symbols, features, and quick high-stakes spins—Mortal Oath style fantasy.",
+    longDescription:
       "Casino Slot Game i.e. Mortal Oath is an exciting slot machine experience themed around ancient powers and high-stakes destiny. Spin the reels, unlock special symbols, trigger bonus features, and chase big wins as you immerse yourself in a world of mystery and fortune. Perfect for quick, thrilling gameplay sessions.",
     genres: ["Anime", "Casual", "Slots", "Casino"],
     images: [
@@ -314,7 +349,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Yeti Penguin Hit Game",
-    description: `A fun and satisfying 3D tap-timing game where the Yeti smashes a penguin across snowy terrain! Developed in Unity for Android & iOS with engaging visuals and dynamic physics.
+    shortDescription:
+      "3D tap-timing smash game—ragdoll penguin flight, skins, leaderboards, IronSource ads, and Firebase.",
+    longDescription: `A fun and satisfying 3D tap-timing game where the Yeti smashes a penguin across snowy terrain! Developed in Unity for Android & iOS with engaging visuals and dynamic physics.
 
       Core Features:
       - 3D ragdoll penguin physics with dynamic flight paths
@@ -337,7 +374,9 @@ const portfolioData: PortfolioSeedItem[] = [
   },
   {
     title: "Pixel Adventure Multiplayer Platformer Game",
-    description: `It's a fun multiplayer platformer game which includes the following
+    shortDescription:
+      "Pixel-art multiplayer platformer with traps, 50 levels, AI enemies, leaderboard, and polished VFX.",
+    longDescription: `It's a fun multiplayer platformer game which includes the following
 
       - Pixel art design
       - Enemy AI
@@ -432,7 +471,8 @@ async function main() {
     const project = await prisma.project.create({
       data: {
         title: p.title,
-        description: p.description,
+        shortDescription: p.shortDescription,
+        longDescription: p.longDescription,
         // will be replaced with ImageKit URL below
         mainImage: p.mainImage,
       },
