@@ -2,8 +2,15 @@
 
 import Image from "next/image";
 import { Key, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getYouTubeEmbedSrc } from "@/lib/youtubeEmbed";
+import type { PortfolioProject } from "./types";
 
-const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => void }) => {
+type GalleryEntry =
+  | { key: string; kind: "youtube"; embedSrc: string }
+  | { key: string; kind: "image"; url: string }
+  | { key: string; kind: "mp4"; url: string };
+
+const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClose: () => void }) => {
   const images = useMemo(() => {
     const galleryImages: string[] = Array.isArray(project.images) ? project.images : [];
     const mainImage: string | undefined = project.mainImage;
@@ -33,7 +40,7 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
   useEffect(() => {
     setOrientations({});
     setLoadedMedia(new Set());
-  }, [images]);
+  }, [images, project.youtubeUrl, project.enableVideo]);
 
   // Reset lightbox loader whenever the active lightbox image changes.
   useEffect(() => {
@@ -85,6 +92,21 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
 
     return { orderedMedia: ordered, portraits: p };
   }, [images, orientations, project.mainImage]);
+
+  const galleryEntries = useMemo((): GalleryEntry[] => {
+    const base: GalleryEntry[] = orderedMedia.map((url) =>
+      url.toLowerCase().endsWith(".mp4")
+        ? { key: url, kind: "mp4" as const, url }
+        : { key: url, kind: "image" as const, url }
+    );
+
+    const watch = project.youtubeUrl?.trim();
+    const embedSrc = watch ? getYouTubeEmbedSrc(watch) : null;
+    if (!embedSrc) return base;
+
+    const yt: GalleryEntry = { key: `youtube:${embedSrc}`, kind: "youtube", embedSrc };
+    return project.enableVideo ? [yt, ...base] : [...base, yt];
+  }, [orderedMedia, project.youtubeUrl, project.enableVideo]);
 
   const portraitSet = useMemo(() => new Set(portraits), [portraits]);
   const lightboxMedia = useMemo(() => orderedMedia.filter((m) => !m.toLowerCase().endsWith(".mp4")), [orderedMedia]);
@@ -154,9 +176,12 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
         {/* Content */}
         <div className="p-8">
           <h2 className="text-4xl font-bold text-white mb-6">{project.title}</h2>
-          <p className="text-gray-300 whitespace-pre-line mb-8">{project.description}</p>
+          <div className="space-y-4 mb-8">
+            <p className="text-white/90 text-lg leading-relaxed whitespace-pre-line">{project.shortDescription}</p>
+            <p className="text-gray-300 whitespace-pre-line leading-relaxed">{project.longDescription}</p>
+          </div>
 
-          <div className="flex flex-wrap gap-3 mb-10">
+          <div className="flex flex-wrap gap-3 mb-4">
             {project.genres.map((genre: string, i: Key | null | undefined) => (
               <span key={i} className="border border-gray-700 px-4 py-2 rounded-md text-white">{genre}</span>
             ))}
@@ -183,21 +208,49 @@ const PortfolioModal = ({ project, onClose }: { project: any; onClose: () => voi
             )}
 
             <div ref={containerRef} className="flex gap-4 overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth items-center">
-              {orderedMedia.map((media) => {
-                const isVideo = media.toLowerCase().endsWith(".mp4");
+              {galleryEntries.map((entry) => {
+                if (entry.kind === "youtube") {
+                  const isLoaded = loadedMedia.has(entry.key);
+                  return (
+                    <div
+                      key={entry.key}
+                      className="relative flex-shrink-0 h-64 w-[min(100%,380px)] lg:w-[420px] bg-black flex items-center justify-center rounded-lg border border-gray-600 shadow-md overflow-hidden"
+                    >
+                      {!isLoaded && (
+                        <div className="absolute inset-0 flex items-center justify-center z-[5] pointer-events-none">
+                          <div className="h-6 w-6 rounded-full border-2 border-white/25 border-t-neon-green animate-spin" />
+                        </div>
+                      )}
+                      <iframe
+                        title={`${project.title} video`}
+                        src={entry.embedSrc}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        className={`h-full w-full border-0 rounded-lg transition-opacity duration-200 ${
+                          isLoaded ? "opacity-100" : "opacity-0"
+                        }`}
+                        onLoad={() => markMediaLoaded(entry.key)}
+                      />
+                    </div>
+                  );
+                }
+
+                const media = entry.url;
+                const isVideo = entry.kind === "mp4";
                 const isRemote = /^https?:\/\//i.test(media);
                 const isPortrait = portraitSet.has(media);
                 const isLoaded = loadedMedia.has(media);
 
                 return (
                   <div
-                    key={media}
+                    key={entry.key}
                     onClick={() => {
                       if (isVideo) return;
                       const lbIndex = lightboxMedia.indexOf(media);
                       if (lbIndex >= 0) setLightboxIndex(lbIndex);
                     }}
-                    className={`relative flex-shrink-0 h-64 bg-black flex items-center justify-center rounded-lg shadow-md cursor-pointer overflow-hidden
+                    className={`relative flex-shrink-0 h-64 bg-black flex items-center justify-center rounded-lg border border-gray-600 shadow-md overflow-hidden
+                      ${isVideo ? "cursor-default" : "cursor-pointer"}
                       ${isPortrait ? "w-[180px] lg:w-[220px]" : "w-[250px] lg:w-[350px]"}
                     `}
                   >

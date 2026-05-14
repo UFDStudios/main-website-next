@@ -8,10 +8,15 @@ datasource db {
 }
 
 model Project {
-  id          String         @id @default(cuid())
-  title       String
-  description String
-  mainImage   String
+  id               String         @id @default(cuid())
+  title            String
+  shortDescription String
+  longDescription  String
+  mainImage        String
+  youtubeUrl       String?
+  googlePlayLink   String?
+  appStoreLink     String?
+  enableVideo      Boolean        @default(false)
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 

@@ -2,14 +2,28 @@
 
 import Image from "next/image";
 import { Key, useEffect, useMemo, useState } from "react";
+import { getYouTubeEmbedSrc, isYouTubeUrl } from "@/lib/youtubeEmbed";
+import type { PortfolioProject } from "./types";
 
-const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }) => {
+const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick: () => void }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mediaLoading, setMediaLoading] = useState(true);
   
   const allMedia = useMemo(() => {
-    return [project.mainImage, ...project.images];
-  }, [project.mainImage, project.images]);
+    const combined = [project.mainImage, ...project.images];
+    const deduped = Array.from(new Set(combined));
+    const yt = project.youtubeUrl?.trim() && getYouTubeEmbedSrc(project.youtubeUrl)
+      ? project.youtubeUrl.trim()
+      : null;
+    return yt ? [...deduped, yt] : deduped;
+  }, [project.mainImage, project.images, project.youtubeUrl]);
+
+  useEffect(() => {
+    setCurrentIndex((i) => {
+      if (!allMedia.length) return 0;
+      return Math.min(i, allMedia.length - 1);
+    });
+  }, [allMedia]);
 
   useEffect(() => {
     setMediaLoading(true);
@@ -25,6 +39,8 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
 
   const currentMedia = allMedia[currentIndex] || "";
   const isVideo = currentMedia.toLowerCase().endsWith(".mp4");
+  const isYouTube = isYouTubeUrl(currentMedia);
+  const youTubeEmbed = isYouTube ? getYouTubeEmbedSrc(currentMedia) : null;
   const isRemote = /^https?:\/\//i.test(currentMedia);
 
   return (
@@ -75,7 +91,18 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
           )}
 
           {/* Media Display */}
-          {isVideo ? (
+          {isYouTube && youTubeEmbed ? (
+            <iframe
+              title={`${project.title} trailer`}
+              src={youTubeEmbed}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className={`h-full w-full max-h-full max-w-full rounded-lg border-0 aspect-video ${
+                mediaLoading ? "opacity-0" : "opacity-100"
+              } transition-opacity duration-200`}
+              onLoad={() => setMediaLoading(false)}
+            />
+          ) : isVideo ? (
             <video
               src={currentMedia}
               controls
@@ -106,7 +133,7 @@ const ProjectCard = ({ project, onClick }: { project: any; onClick: () => void }
           </h3>
 
           <p className="text-gray-400 text-sm leading-relaxed line-clamp-3 mb-5">
-            {project.description}
+            {project.shortDescription}
           </p>
 
           <div className="flex gap-3 flex-wrap">
