@@ -49,7 +49,7 @@ const SectionThree = () => {
       title2: "Success Package",
       title3: "Complete Vertical Production Integration",
       text: `This is the unified combination of our four core pillars (Design, Engineering, QA, and Marketing). Designed for funded startups and ambitious publishers, this package provides a market-ready product by ensuring the monetization design matches the engineering constraints and the UA creative strategy. It removes the friction of managing multiple vendors, transferring all technical and creative risk to our expert team.`,
-      image: "/images/ourServices/engineering.png",
+      image: "/images/ourServices/allInOne.png",
     },
   ]
 
@@ -63,7 +63,7 @@ const SectionThree = () => {
   return (
     <div className="mt-4 mx-4">
       <div className="md:flex text-center md:text-start lg:mt-32 lg:p-14">
-        <h1 className="text-foreground font-extrabold md:text-7xl text-4xl">
+        <h1 className="text-foreground font-extrabold text-3xl md:text-5xl lg:text-6xl">
           <span className="text-neon-green">"</span>
           <span className="border-b-2 border-foreground">Our Services &</span> <span className="text-neon-green">Specialized Packages</span>
           <span className="text-neon-green">"</span>
@@ -75,29 +75,29 @@ const SectionThree = () => {
             <Image
               src={`/images/numbers/${activeTab + 1}.png`}
               alt="Service Number"
-              width={300}
-              height={300}
-              className="relative z-10 left-12 hidden md:block"
+              width={220}
+              height={220}
+              className="relative z-10 left-8 hidden max-h-[11rem] w-auto md:block md:max-h-[13rem]"
             />
-            <div className="flex flex-col justify-center text-center ml-16">
-              <h2 className="text-neon-green md:text-6xl text-3xl font-semibold">
+            <div className="ml-10 flex flex-col justify-center text-center md:ml-14">
+              <h2 className="text-2xl font-semibold text-neon-green md:text-4xl lg:text-5xl">
                 <span className="text-neon-green">"</span>
                 {content[activeTab].title}
               </h2>
-              <h2 className="text-foreground md:text-6xl text-3xl font-semibold">
+              <h2 className="text-2xl font-semibold text-foreground md:text-4xl lg:text-5xl">
                 {content[activeTab].title2}
                 <span className="text-neon-green">"</span>
               </h2>
             </div>
-            <div className="ml-8 mt-6 lg:px-20">
-              <p className="text-white md:text-3xl text-2xl font-bold text-center">
+            <div className="ml-6 mt-5 md:ml-8 lg:px-14">
+              <p className="text-center text-lg font-bold text-white md:text-2xl lg:text-3xl">
                 <span className="text-neon-green">"</span>
                 {content[activeTab].title3}
                 <span className="text-neon-green">"</span>
               </p>
             </div>
-            <div className="ml-8 mt-2 lg:px-20">
-              <p className="text-white md:text-2xl text-xl text-justify">{content[activeTab].text}</p>
+            <div className="ml-6 mt-2 md:ml-8 lg:px-14">
+              <p className="text-justify text-base text-white md:text-lg lg:text-xl">{content[activeTab].text}</p>
             </div>
           </div>
 
@@ -106,70 +106,58 @@ const SectionThree = () => {
               <Image
                 src={content[activeTab].image || "/placeholder.svg"}
                 alt="Service Image"
-                width={500}
-                height={500}
-                className="relative z-10"
+                width={400}
+                height={400}
+                className="relative z-10 max-h-[min(55vh,22rem)] w-auto max-w-full lg:max-h-[min(60vh,26rem)]"
                 priority
               />
             </Reveal>
           </div>
         </div>
 
-        <div className="md:flex md:justify-center mt-8 grid grid-cols-2">
+        <div className="mt-8 grid grid-cols-2 gap-y-8 md:flex md:justify-center md:gap-x-4 lg:gap-x-8">
           {content.map((item, index) => (
             <div
               key={index}
-              className={`w-full flex flex-col items-center md:space-x-24 cursor-pointer md:border-b-2 md:border-dotted pb-6 ${
+              className={`flex min-w-0 basis-0 flex-col items-center pb-6 md:flex-1 md:border-b-2 md:border-dotted md:border-foreground/40 ${
                 activeTab === index ? "text-foreground" : "text-gray-400"
-              }`}
+              } cursor-pointer`}
               onClick={() => setActiveTab(index)}
             >
-              <div
-                className={`w-20 h-10 flex items-center justify-center ${
-                  activeTab === index ? "border-foreground" : "border-gray-400"
-                }`}
-              >
-                <span className={`${activeTab === index ? "text-foreground" : "text-gray-400"}`}>
-                  <Image
-                    src={`/images/numbers/${index + 1}.png`}
-                    alt="Number"
-                    width={200}
-                    height={100}
-                    className="relative z-10 md:top-1 md:left-12 w-[50rem]"
-                  />
-                </span>
+              <div className="relative z-10 flex h-11 w-full items-center justify-center md:h-16">
+                <Image
+                  src={`/images/numbers/${index + 1}.png`}
+                  alt=""
+                  width={160}
+                  height={80}
+                  className="h-full w-auto max-w-[min(100%,5.5rem)] object-contain object-bottom md:max-w-[min(100%,7rem)]"
+                />
               </div>
-              <span
-                className={`${
-                  activeTab === index ? "text-neon-green md:text-2xl ml-16" : "text-gray-400 md:text-xl text-base ml-16"
-                }`}
-              >
-                "{item.title}
-              </span>
-              <span
-                className={`text-xl ${
-                  activeTab === index ? "text-foreground md:text-2xl ml-16" : "text-gray-400 md:text-xl text-base ml-16"
-                }`}
-              >
-                {item.title2} <span className="text-neon-green">"</span>
-              </span>
-              {activeTab === index ? (
-                <Image
-                  src="/images/numbers/ActiveDot.png"
-                  alt="Active Dot"
-                  width={40}
-                  height={40}
-                  className="relative z-10 md:top-[2.9rem] w-10 hidden md:block"
-                />
-              ) : (
-                <Image
-                  src="/images/numbers/Dot.png"
-                  alt="Inactive Dot"
-                  width={40}
-                  height={40}
-                  className="relative z-10 md:top-[3.6rem] hidden md:block"
-                />
-              )}
+              <div className="mt-1.5 flex w-full min-w-0 flex-1 items-center justify-center px-1 md:mt-2 md:min-h-[4.25rem] lg:min-h-[5rem]">
+                <p
+                  className={`max-w-full text-center text-sm leading-snug [overflow-wrap:anywhere] md:text-base lg:text-lg ${
+                    activeTab === index ? "md:font-semibold" : ""
+                  }`}
+                >
+                  <span className="text-neon-green">"</span>
+                  <span className={activeTab === index ? "text-neon-green" : ""}>{item.title}</span>{" "}
+                  <span className={activeTab === index ? "text-foreground" : ""}>{item.title2}</span>
+                  <span className="text-neon-green">"</span>
+                </p>
+              </div>
+              <div className="mt-2 hidden shrink-0 justify-center md:mt-3 md:flex">
+                {activeTab === index ? (
+                  <Image
+                    src="/images/numbers/ActiveDot.png"
+                    alt=""
+                    width={32}
+                    height={32}
+                    className="h-6 w-6 md:h-8 md:w-8"
+                  />
+                ) : (
+                  <Image src="/images/numbers/Dot.png" alt="" width={32} height={32} className="h-6 w-6 md:h-8 md:w-8" />
+                )}
+              </div>
             </div>
           ))}
         </div>

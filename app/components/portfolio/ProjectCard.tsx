@@ -15,8 +15,10 @@ const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick:
     const yt = project.youtubeUrl?.trim() && getYouTubeEmbedSrc(project.youtubeUrl)
       ? project.youtubeUrl.trim()
       : null;
-    return yt ? [...deduped, yt] : deduped;
-  }, [project.mainImage, project.images, project.youtubeUrl]);
+    if (!yt) return deduped;
+    // On the grid (modal closed): trailer first only when enableVideo; otherwise mainImage leads.
+    return project.enableVideo ? [yt, ...deduped] : [...deduped, yt];
+  }, [project.mainImage, project.images, project.youtubeUrl, project.enableVideo]);
 
   useEffect(() => {
     setCurrentIndex((i) => {
