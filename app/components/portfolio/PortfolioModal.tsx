@@ -181,14 +181,14 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
             <p className="text-gray-300 whitespace-pre-line leading-relaxed">{project.longDescription}</p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-3 mb-8">
-            <div className="flex min-w-0 flex-1 flex-wrap gap-3">
+          <div className="mb-8 flex flex-col gap-y-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-3">
+            <div className="flex flex-wrap gap-3 sm:min-w-0 sm:flex-1">
               {project.genres.map((genre: string, i: Key | null | undefined) => (
                 <span key={i} className="border border-gray-700 px-4 py-2 rounded-md text-white">{genre}</span>
               ))}
             </div>
             {(project.googlePlayLink?.trim() || project.appStoreLink?.trim()) && (
-              <div className="ml-auto flex flex-shrink-0 flex-wrap items-center justify-end gap-4">
+              <div className="flex flex-shrink-0 flex-wrap items-center gap-4 sm:ml-auto sm:justify-end">
                 {project.googlePlayLink?.trim() && (
                   <a
                     href={project.googlePlayLink.trim()}

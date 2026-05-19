@@ -8,12 +8,14 @@ export default function LayoutContent({ children }: { children: React.ReactNode 
   
     const pathname = usePathname()
     const hideNavbarAndFooterPaths = ['/portfolio/view']
-    const showNavbarAndFooter = !hideNavbarAndFooterPaths.includes(pathname)
+    const isAdminRoute = pathname.startsWith('/admin')
+    const showNavbarAndFooter =
+      !hideNavbarAndFooterPaths.includes(pathname) && !isAdminRoute
   
     return (
     <>
         {showNavbarAndFooter && <Navbar />}
-        <main className="pt-[8rem]">{children}</main>
+        <main className={isAdminRoute ? '' : 'pt-[8rem]'}>{children}</main>
         {showNavbarAndFooter && <Footer />}
     </>
     )
