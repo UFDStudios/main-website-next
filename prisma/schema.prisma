@@ -59,3 +59,12 @@ model Media {
   @@index([projectId, sortOrder])
 }
 
+/// Admin login — add rows via Prisma Studio or SQL (username + password).
+model AdminUser {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
