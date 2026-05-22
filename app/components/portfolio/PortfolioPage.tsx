@@ -78,10 +78,9 @@ const Portfolio = () => {
       });
     });
 
-    // Sort by frequency (highest first)
+    // Sort by frequency (highest first), then alphabetically for ties
     const sortedGenres = Object.entries(genreCount)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 7) // 👈 top 7 only
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .map(entry => entry[0]);
 
     return ["All", ...sortedGenres];
@@ -120,12 +119,64 @@ const Portfolio = () => {
     );
   }, [activeGenre, projects]);
 
+  const activeProjectIndex = useMemo(() => {
+    if (!activeProject) return -1;
+    return filteredProjects.findIndex((p) => p.id === activeProject.id);
+  }, [activeProject, filteredProjects]);
+
+  const goToPrevProject = useCallback(() => {
+    const len = filteredProjects.length;
+    if (len <= 1 || activeProjectIndex < 0) return;
+    const next = (activeProjectIndex - 1 + len) % len;
+    setActiveProject(filteredProjects[next]);
+  }, [activeProjectIndex, filteredProjects]);
+
+  const goToNextProject = useCallback(() => {
+    const len = filteredProjects.length;
+    if (len <= 1 || activeProjectIndex < 0) return;
+    const next = (activeProjectIndex + 1) % len;
+    setActiveProject(filteredProjects[next]);
+  }, [activeProjectIndex, filteredProjects]);
+
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollButtons = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) {
+      setCanScrollLeft(false);
+      setCanScrollRight(false);
+      return;
+    }
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft < maxScroll - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    el.scrollLeft = 0;
+    updateScrollButtons();
+
+    const onScroll = () => updateScrollButtons();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    const ro = new ResizeObserver(() => updateScrollButtons());
+    ro.observe(el);
+
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      ro.disconnect();
+    };
+  }, [allGenres, updateScrollButtons]);
+
   const scrollLeft = () => {
-    scrollRef.current?.scrollBy({ left: -200, behavior: "smooth" });
+    scrollRef.current?.scrollBy({ left: -280, behavior: "smooth" });
   };
 
   const scrollRight = () => {
-    scrollRef.current?.scrollBy({ left: 200, behavior: "smooth" });
+    scrollRef.current?.scrollBy({ left: 280, behavior: "smooth" });
   };
 
   return (
@@ -139,29 +190,30 @@ const Portfolio = () => {
             </h1>
           </div>
 
-          {/* 🔥 GENRE BAR */}
+          {/* Genre carousel — scroll row; arrows sit beside track so "All" is not clipped */}
           {!loading && !loadError && (
-            <div className="relative mb-10 overflow-visible">
-
-              {/* Left Arrow */}
+            <div className="flex items-center gap-3 mb-10 min-w-0">
               <button
+                type="button"
                 onClick={scrollLeft}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black text-white w-10 h-10 rounded-full"
+                disabled={!canScrollLeft}
+                aria-label="Scroll genres left"
+                className="shrink-0 bg-black/70 hover:bg-black disabled:opacity-30 disabled:pointer-events-none text-white w-10 h-10 rounded-full"
               >
                 ‹
               </button>
 
-              {/* Scroll Container */}
               <div
                 ref={scrollRef}
-                className="flex gap-4 overflow-x-auto scrollbar-hide justify-start sm:justify-center min-w-full px-12"
+                className="flex flex-nowrap gap-4 overflow-x-auto scrollbar-hide scroll-smooth justify-start min-w-0 flex-1 py-1"
               >
                 {allGenres.map((genre) => (
                   <button
                     key={genre}
-                    onClick={() => handleGenreClick(genre)}  // 👈 Updated handler
+                    type="button"
+                    onClick={() => handleGenreClick(genre)}
                     className={`
-                      px-8 py-3 text-lg rounded-full border whitespace-nowrap transition-all duration-200
+                      shrink-0 px-8 py-3 text-lg rounded-full border whitespace-nowrap transition-all duration-200
                       ${
                         activeGenre === genre
                           ? "bg-neon-green text-black border-neon-green"
@@ -174,10 +226,12 @@ const Portfolio = () => {
                 ))}
               </div>
 
-              {/* Right Arrow */}
               <button
+                type="button"
                 onClick={scrollRight}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black text-white w-10 h-10 rounded-full"
+                disabled={!canScrollRight}
+                aria-label="Scroll genres right"
+                className="shrink-0 bg-black/70 hover:bg-black disabled:opacity-30 disabled:pointer-events-none text-white w-10 h-10 rounded-full"
               >
                 ›
               </button>
@@ -207,7 +261,13 @@ const Portfolio = () => {
       </section>
 
       {activeProject && (
-        <PortfolioModal project={activeProject} onClose={() => setActiveProject(null)}/>
+        <PortfolioModal
+          project={activeProject}
+          onClose={() => setActiveProject(null)}
+          onPrevProject={goToPrevProject}
+          onNextProject={goToNextProject}
+          canNavigateProjects={filteredProjects.length > 1}
+        />
       )}
     </>
   );

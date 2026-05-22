@@ -12,7 +12,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (pathname === "/admin/login" || pathname === "/api/admin/login") {
+  if (
+    pathname === "/admin/login" ||
+    pathname === "/api/admin/login" ||
+    pathname === "/api/admin/change-password"
+  ) {
     return NextResponse.next();
   }
 
