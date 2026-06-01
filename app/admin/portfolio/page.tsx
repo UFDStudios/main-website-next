@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import AdminShell from "@/app/admin/components/AdminShell";
 import ConfirmDialog from "@/app/admin/components/ConfirmDialog";
+import PortfolioSortableList from "@/app/admin/components/PortfolioSortableList";
 import type { PortfolioProject } from "@/app/components/portfolio/types";
 import { adminUi } from "@/lib/admin-ui";
 
@@ -90,50 +90,16 @@ export default function AdminPortfolioListPage() {
         <p className={adminUi.mutedSm}>No projects yet. Create your first one.</p>
       )}
 
-      {!listBusy && !error && (
-      <ul className="space-y-3">
-        {projects.map((project) => (
-          <li key={project.id} className={`flex flex-wrap items-center gap-4 ${adminUi.card}`}>
-            <div className="relative h-16 w-24 shrink-0 rounded-lg overflow-hidden border border-foreground/10">
-              {project.mainImage ? (
-                <Image
-                  src={project.mainImage}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-              ) : (
-                <div className="h-full w-full bg-foreground/5" />
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-foreground truncate">{project.title}</p>
-              <p className={`text-xs ${adminUi.muted} mt-0.5`}>
-                {project.genres.join(" · ") || "No genres"}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Link
-                href={`/admin/portfolio/${project.id}`}
-                className={adminUi.btnSecondary}
-              >
-                Edit
-              </Link>
-              <button
-                type="button"
-                onClick={() => {
-                  setDeleteError(null);
-                  setPendingDelete({ id: project.id, title: project.title });
-                }}
-                className="rounded-lg border border-red-500/30 px-3 py-1.5 text-sm font-medium text-red-300 hover:bg-red-500/10 transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {!listBusy && !error && projects.length > 0 && (
+        <PortfolioSortableList
+          projects={projects}
+          onProjectsChange={setProjects}
+          disabled={deleting}
+          onRequestDelete={(project) => {
+            setDeleteError(null);
+            setPendingDelete(project);
+          }}
+        />
       )}
 
       <ConfirmDialog
