@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export async function GET() {
   try {
     const projects = await prisma.project.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
       include: {
         genres: { include: { genre: true } },
         media: { orderBy: { sortOrder: "asc" } },

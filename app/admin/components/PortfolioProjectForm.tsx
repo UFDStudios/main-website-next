@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import type { PortfolioProject } from "@/app/components/portfolio/types";
 import { adminUi } from "@/lib/admin-ui";
+import RichTextEditor, { isRichTextEmpty } from "@/app/admin/components/RichTextEditor";
 
 type FormState = {
   title: string;
@@ -18,11 +19,20 @@ type FormState = {
   images: string;
 };
 
+function plainTextToHtml(text: string) {
+  if (!text) return "";
+  if (/<[a-z][\s\S]*>/i.test(text)) return text;
+  return text
+    .split(/\n{2,}/)
+    .map((paragraph) => `<p>${paragraph.replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
 function toFormState(project?: PortfolioProject | null): FormState {
   return {
     title: project?.title ?? "",
-    shortDescription: project?.shortDescription ?? "",
-    longDescription: project?.longDescription ?? "",
+    shortDescription: plainTextToHtml(project?.shortDescription ?? ""),
+    longDescription: plainTextToHtml(project?.longDescription ?? ""),
     mainImage: project?.mainImage ?? "",
     youtubeUrl: project?.youtubeUrl ?? "",
     googlePlayLink: project?.googlePlayLink ?? "",
@@ -48,13 +58,47 @@ export default function PortfolioProjectForm({
   const [saving, setSaving] = useState(false);
   const [uploadingMain, setUploadingMain] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [galleryUploadProgress, setGalleryUploadProgress] = useState<{
+    current: number;
+    total: number;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploadNotice, setUploadNotice] = useState<string | null>(null);
+
+  const galleryUrls = form.images
+    .split("\n")
+    .map((u) => u.trim())
+    .filter(Boolean);
+
+  const isGalleryVideo = (url: string) => /\.(mp4|webm|mov)(\?|$)/i.test(url);
 
   const uploading = uploadingMain || uploadingGallery;
 
   const update = (key: keyof FormState, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const uploadFileToUrl = async (file: File): Promise<string> => {
+    const body = new FormData();
+    body.set("file", file);
+    body.set("folder", projectId ? `/portfolio/${projectId}` : "/portfolio/admin");
+
+    const res = await fetch("/api/admin/upload", {
+      method: "POST",
+      body,
+      credentials: "include",
+    });
+
+    const contentType = res.headers.get("content-type") ?? "";
+    const data = contentType.includes("application/json")
+      ? ((await res.json()) as { url?: string; error?: string })
+      : null;
+
+    if (!res.ok) {
+      throw new Error(data?.error ?? `Upload failed (${res.status})`);
+    }
+    if (!data?.url) throw new Error("No URL returned from upload");
+    return data.url;
   };
 
   const uploadFile = async (
@@ -66,26 +110,7 @@ export default function PortfolioProjectForm({
     setError(null);
     setUploadNotice(null);
     try {
-      const body = new FormData();
-      body.set("file", file);
-      body.set("folder", projectId ? `/portfolio/${projectId}` : "/portfolio/admin");
-
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body,
-        credentials: "include",
-      });
-
-      const contentType = res.headers.get("content-type") ?? "";
-      const data = contentType.includes("application/json")
-        ? ((await res.json()) as { url?: string; error?: string })
-        : null;
-
-      if (!res.ok) {
-        throw new Error(data?.error ?? `Upload failed (${res.status})`);
-      }
-      if (!data?.url) throw new Error("No URL returned from upload");
-      onUrl(data.url);
+      onUrl(await uploadFileToUrl(file));
       setUploadNotice("Image uploaded.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
@@ -94,10 +119,53 @@ export default function PortfolioProjectForm({
     }
   };
 
+  const appendGalleryUrl = (url: string) => {
+    setForm((prev) => {
+      const existing = prev.images.trim();
+      const next = existing ? `${existing}\n${url}` : url;
+      return { ...prev, images: next };
+    });
+  };
+
+  const uploadGalleryFiles = async (files: File[]) => {
+    if (files.length === 0) return;
+    setUploadingGallery(true);
+    setGalleryUploadProgress({ current: 0, total: files.length });
+    setError(null);
+    setUploadNotice(null);
+    try {
+      let completed = 0;
+      for (const file of files) {
+        const url = await uploadFileToUrl(file);
+        appendGalleryUrl(url);
+        completed += 1;
+        setGalleryUploadProgress({ current: completed, total: files.length });
+        setUploadNotice(
+          completed === files.length
+            ? files.length === 1
+              ? "Image uploaded."
+              : `${files.length} images uploaded.`
+            : `Uploaded ${completed} of ${files.length}…`
+        );
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploadingGallery(false);
+      setGalleryUploadProgress(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setError(null);
+
+    if (isRichTextEmpty(form.shortDescription) || isRichTextEmpty(form.longDescription)) {
+      setError("Short and long descriptions are required.");
+      setSaving(false);
+      return;
+    }
 
     const payload = {
       title: form.title,
@@ -142,7 +210,20 @@ export default function PortfolioProjectForm({
   const uploadBtnClass = `${adminUi.btnSecondary} cursor-pointer inline-block`;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="relative space-y-6">
+      {saving && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-black/60 backdrop-blur-sm"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          aria-label="Saving project"
+        >
+          <div className="h-10 w-10 rounded-full border-2 border-white/25 border-t-neon-green animate-spin" />
+          <p className="text-sm font-medium text-foreground">Saving project…</p>
+        </div>
+      )}
+
       {error && (
         <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {error}
@@ -164,26 +245,25 @@ export default function PortfolioProjectForm({
             onChange={(e) => update("title", e.target.value)}
           />
         </label>
-        <label className="block sm:col-span-2">
-          <span className={adminUi.label}>Short description</span>
-          <textarea
+        <div className="sm:col-span-2">
+          <RichTextEditor
+            label="Short description"
             required
-            rows={2}
-            className={adminUi.textarea}
+            minHeight="5rem"
+            contentClassName="text-lg"
             value={form.shortDescription}
-            onChange={(e) => update("shortDescription", e.target.value)}
+            onChange={(html) => update("shortDescription", html)}
           />
-        </label>
-        <label className="block sm:col-span-2">
-          <span className={adminUi.label}>Long description</span>
-          <textarea
+        </div>
+        <div className="sm:col-span-2">
+          <RichTextEditor
+            label="Long description"
             required
-            rows={5}
-            className={adminUi.textarea}
+            minHeight="12rem"
             value={form.longDescription}
-            onChange={(e) => update("longDescription", e.target.value)}
+            onChange={(html) => update("longDescription", html)}
           />
-        </label>
+        </div>
         <label className="block sm:col-span-2">
           <span className={adminUi.label}>Genres (comma-separated)</span>
           <input
@@ -232,31 +312,57 @@ export default function PortfolioProjectForm({
 
       <div className="block">
         <span className={adminUi.label}>Gallery image URLs (one per line)</span>
+        {galleryUrls.length > 0 && (
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            {galleryUrls.map((url, index) => (
+              <div
+                key={`${url}-${index}`}
+                className="relative aspect-square overflow-hidden rounded-lg border border-foreground/10 bg-foreground/5"
+              >
+                {isGalleryVideo(url) ? (
+                  <video
+                    src={url}
+                    className="h-full w-full object-cover"
+                    muted
+                    playsInline
+                    preload="metadata"
+                  />
+                ) : (
+                  <Image
+                    src={url}
+                    alt={`Gallery ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
         <textarea
           rows={4}
-          className={`${adminUi.textarea} text-xs`}
+          className={`${adminUi.textarea} text-xs mt-3`}
           value={form.images}
           onChange={(e) => update("images", e.target.value)}
         />
         <label className={`mt-2 ${uploadBtnClass}`}>
-          {uploadingGallery ? "Uploading…" : "Add gallery image"}
+          {uploadingGallery && galleryUploadProgress
+            ? `Uploading ${galleryUploadProgress.current}/${galleryUploadProgress.total}…`
+            : uploadingGallery
+              ? "Uploading…"
+              : "Add gallery images"}
           <input
             type="file"
             accept="image/*,video/mp4"
+            multiple
             className="hidden"
             disabled={uploadingGallery}
             onChange={(e) => {
               const input = e.target;
-              const file = input.files?.[0];
-              if (file) {
-                void uploadFile(
-                  file,
-                  (url) => {
-                    const next = form.images.trim() ? `${form.images.trim()}\n${url}` : url;
-                    update("images", next);
-                  },
-                  setUploadingGallery
-                );
+              const files = input.files ? Array.from(input.files) : [];
+              if (files.length > 0) {
+                void uploadGalleryFiles(files);
               }
               input.value = "";
             }}

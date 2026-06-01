@@ -50,12 +50,43 @@ export async function syncProjectMedia(projectId: string, imageUrls: string[]) {
 
 export async function getProjectInclude() {
   return prisma.project.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
     include: {
       genres: { include: { genre: true } },
       media: { orderBy: { sortOrder: "asc" } },
     },
   });
+}
+
+export async function getNextProjectSortOrder() {
+  const result = await prisma.project.aggregate({ _max: { sortOrder: true } });
+  return (result._max.sortOrder ?? -1) + 1;
+}
+
+export async function reorderProjects(orderedIds: string[]) {
+  const existing = await prisma.project.findMany({ select: { id: true } });
+  const existingIds = new Set(existing.map((p) => p.id));
+
+  if (orderedIds.length !== existing.length) {
+    throw new Error("Reorder list must include every project exactly once");
+  }
+
+  const seen = new Set<string>();
+  for (const id of orderedIds) {
+    if (!existingIds.has(id) || seen.has(id)) {
+      throw new Error("Invalid project id in reorder list");
+    }
+    seen.add(id);
+  }
+
+  await prisma.$transaction(
+    orderedIds.map((id, index) =>
+      prisma.project.update({
+        where: { id },
+        data: { sortOrder: index },
+      }),
+    ),
+  );
 }
 
 export async function getProjectById(id: string) {

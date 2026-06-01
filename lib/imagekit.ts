@@ -4,6 +4,10 @@ const MAX_BYTES = 12 * 1024 * 1024; // 12 MB
 
 let client: ImageKit | null = null;
 
+export function isImageKitConfigured(): boolean {
+  return Boolean(process.env.IMAGEKIT_PRIVATE_KEY && process.env.IMAGEKIT_URL_ENDPOINT);
+}
+
 function getImageKitClient(): ImageKit {
   const privateKey = process.env.IMAGEKIT_PRIVATE_KEY ?? "";
   if (!privateKey) {

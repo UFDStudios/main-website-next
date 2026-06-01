@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/admin-api";
-import { uploadBufferToImageKit } from "@/lib/imagekit";
+import { uploadAdminFile } from "@/lib/upload";
 
 export const runtime = "nodejs";
 
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const url = await uploadBufferToImageKit(buffer, file.name, folder);
+    const url = await uploadAdminFile(buffer, file.name, folder);
 
     return NextResponse.json({ url });
   } catch (err) {

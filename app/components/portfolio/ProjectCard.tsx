@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Key, useEffect, useMemo, useState } from "react";
 import { getYouTubeEmbedSrc, isYouTubeUrl } from "@/lib/youtubeEmbed";
+import { stripRichText } from "@/app/components/RichTextContent";
 import type { PortfolioProject } from "./types";
 
 const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick: () => void }) => {
@@ -135,7 +136,7 @@ const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick:
           </h3>
 
           <p className="text-gray-400 text-sm leading-relaxed line-clamp-3 mb-5">
-            {project.shortDescription}
+            {stripRichText(project.shortDescription)}
           </p>
 
           <div className="flex gap-3 flex-wrap">

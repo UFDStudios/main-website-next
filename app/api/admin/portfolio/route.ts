@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/admin-api";
 import { mapProjectToApi } from "@/lib/portfolio-mapper";
 import {
+  getNextProjectSortOrder,
   getProjectInclude,
   syncProjectGenres,
   syncProjectMedia,
@@ -60,6 +61,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid project data" }, { status: 400 });
     }
 
+    const sortOrder = await getNextProjectSortOrder();
+
     const project = await prisma.project.create({
       data: {
         title: data.title,
@@ -70,6 +73,7 @@ export async function POST(request: Request) {
         googlePlayLink: data.googlePlayLink,
         appStoreLink: data.appStoreLink,
         enableVideo: data.enableVideo ?? false,
+        sortOrder,
       },
     });
 

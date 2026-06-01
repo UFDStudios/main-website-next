@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { Key, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { getYouTubeEmbedSrc } from "@/lib/youtubeEmbed";
+import RichTextContent from "@/app/components/RichTextContent";
 import type { PortfolioProject } from "./types";
 
 type GalleryEntry =
@@ -10,7 +12,21 @@ type GalleryEntry =
   | { key: string; kind: "image"; url: string }
   | { key: string; kind: "mp4"; url: string };
 
-const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClose: () => void }) => {
+type PortfolioModalProps = {
+  project: PortfolioProject;
+  onClose: () => void;
+  onPrevProject?: () => void;
+  onNextProject?: () => void;
+  canNavigateProjects?: boolean;
+};
+
+const PortfolioModal = ({
+  project,
+  onClose,
+  onPrevProject,
+  onNextProject,
+  canNavigateProjects = false,
+}: PortfolioModalProps) => {
   const images = useMemo(() => {
     const galleryImages: string[] = Array.isArray(project.images) ? project.images : [];
     const mainImage: string | undefined = project.mainImage;
@@ -19,6 +35,7 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
     return Array.from(new Set(combined));
   }, [project.mainImage, project.images]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   // Orientation is tracked by media URL (not by array index) so that re-ordering
   // the gallery never causes flags to be written into the wrong slot.
@@ -38,6 +55,12 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
   }, []);
 
   useEffect(() => {
+    setLightboxIndex(null);
+    setScrollX(0);
+    containerRef.current?.scrollTo({ left: 0, behavior: "auto" });
+  }, [project.id]);
+
+  useEffect(() => {
     setOrientations({});
     setLoadedMedia(new Set());
   }, [images, project.youtubeUrl]);
@@ -45,6 +68,12 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
   // Reset lightbox loader whenever the active lightbox image changes.
   useEffect(() => {
     setLightboxLoaded(false);
+  }, [lightboxIndex]);
+
+  // Keep fullscreen image in the viewport (modal overlay is scrollable on mobile).
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    overlayRef.current?.scrollTo({ top: 0, behavior: "auto" });
   }, [lightboxIndex]);
 
   const markMediaLoaded = (media: string) => {
@@ -149,14 +178,126 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
     });
   }, [lightboxMedia.length]);
 
+  const openLightbox = useCallback(
+    (index: number) => {
+      overlayRef.current?.scrollTo({ top: 0, behavior: "auto" });
+      setLightboxIndex(index);
+    },
+    []
+  );
+
+  const lightbox =
+    lightboxIndex !== null ? (
+      <div
+        className="fixed inset-0 bg-black/95 flex items-center justify-center z-[100] cursor-zoom-out p-4"
+        onClick={() => setLightboxIndex(null)}
+      >
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setLightboxIndex(null);
+          }}
+          className="absolute top-4 right-4 text-white text-3xl hover:text-green-400 z-[110]"
+          aria-label="Close fullscreen image"
+        >
+          ×
+        </button>
+
+        <button
+          disabled={lightboxMedia.length <= 1}
+          onClick={(e) => {
+            e.stopPropagation();
+            goLightboxLeft();
+          }}
+          className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-black/80 text-white text-2xl rounded-full border border-white z-[110] touch-manipulation ${
+            lightboxMedia.length <= 1 ? "opacity-40 pointer-events-none" : "hover:bg-black active:bg-black"
+          }`}
+          aria-label="Previous image"
+        >
+          ‹
+        </button>
+        <button
+          disabled={lightboxMedia.length <= 1}
+          onClick={(e) => {
+            e.stopPropagation();
+            goLightboxRight();
+          }}
+          className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-black/80 text-white text-2xl rounded-full border border-white z-[110] touch-manipulation ${
+            lightboxMedia.length <= 1 ? "opacity-40 pointer-events-none" : "hover:bg-black active:bg-black"
+          }`}
+          aria-label="Next image"
+        >
+          ›
+        </button>
+
+        {(() => {
+          const src = lightboxMedia[lightboxIndex];
+          const isRemote = /^https?:\/\//i.test(src);
+          return (
+            <>
+              {!lightboxLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center z-[105] pointer-events-none">
+                  <div className="h-10 w-10 rounded-full border-2 border-white/25 border-t-neon-green animate-spin" />
+                </div>
+              )}
+              <Image
+                src={src}
+                alt=""
+                width={1200}
+                height={1200}
+                unoptimized={isRemote}
+                onClick={(e) => e.stopPropagation()}
+                onLoad={() => setLightboxLoaded(true)}
+                className={`max-w-[calc(100%-5.5rem)] sm:max-w-full max-h-[calc(100dvh-2rem)] object-contain transition-opacity duration-200 ${
+                  lightboxLoaded ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            </>
+          );
+        })()}
+      </div>
+    ) : null;
+
   return (
-    <div  className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-start justify-center pt-10 px-4 overflow-y-auto"
+    <>
+    <div
+      ref={overlayRef}
+      className={`fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-start justify-center pt-10 px-4 ${
+        lightboxIndex !== null ? "overflow-hidden" : "overflow-y-auto"
+      }`}
       onClick={() => {
         if (lightboxIndex === null) {
           onClose();
         }
       }}
     >
+      {lightboxIndex === null && canNavigateProjects && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPrevProject?.();
+            }}
+            className="fixed left-2 sm:left-4 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-12 sm:h-12 hidden sm:flex items-center justify-center bg-black/80 text-white text-2xl rounded-full border border-white z-[60] touch-manipulation hover:bg-black active:bg-black"
+            aria-label="Previous game"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNextProject?.();
+            }}
+            className="fixed right-2 sm:right-4 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-12 sm:h-12 hidden sm:flex items-center justify-center bg-black/80 text-white text-2xl rounded-full border border-white z-[60] touch-manipulation hover:bg-black active:bg-black"
+            aria-label="Next game"
+          >
+            ›
+          </button>
+        </>
+      )}
+
       {/* Modal container */}
       <div
         className="relative w-full max-w-6xl bg-[#0b0b0b] border border-gray-800 rounded-2xl shadow-xl"
@@ -177,8 +318,11 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
         <div className="p-8">
           <h2 className="text-4xl font-bold text-white mb-6">{project.title}</h2>
           <div className="space-y-4 mb-8">
-            <p className="text-white/90 text-lg leading-relaxed whitespace-pre-line">{project.shortDescription}</p>
-            <p className="text-gray-300 whitespace-pre-line leading-relaxed">{project.longDescription}</p>
+            <RichTextContent
+              html={project.shortDescription}
+              className="text-white/90 text-lg"
+            />
+            <RichTextContent html={project.longDescription} className="text-white/90" />
           </div>
 
           <div className="mb-8 flex flex-col gap-y-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-3">
@@ -233,7 +377,8 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
             {canScrollLeft && (
               <button
                 onClick={scrollLeft}
-                className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/70 hover:bg-black text-white text-2xl rounded-full z-10"
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 hidden sm:flex items-center justify-center bg-black/70 hover:bg-black text-white text-2xl rounded-full z-10"
+                aria-label="Scroll gallery left"
               >
                 ‹
               </button>
@@ -241,20 +386,24 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
             {canScrollRight && (
               <button
                 onClick={scrollRight}
-                className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/70 hover:bg-black text-white text-2xl rounded-full z-10"
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 hidden sm:flex items-center justify-center bg-black/70 hover:bg-black text-white text-2xl rounded-full z-10"
+                aria-label="Scroll gallery right"
               >
                 ›
               </button>
             )}
 
-            <div ref={containerRef} className="flex gap-4 overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth items-center">
+            <div
+              ref={containerRef}
+              className="flex flex-col gap-4 sm:flex-row sm:overflow-x-auto sm:overflow-y-hidden scrollbar-hide scroll-smooth sm:items-center"
+            >
               {galleryEntries.map((entry) => {
                 if (entry.kind === "youtube") {
                   const isLoaded = loadedMedia.has(entry.key);
                   return (
                     <div
                       key={entry.key}
-                      className="relative flex-shrink-0 h-64 w-[min(100%,380px)] lg:w-[420px] bg-black flex items-center justify-center rounded-lg border border-gray-600 shadow-md overflow-hidden"
+                      className="relative w-full h-64 sm:flex-shrink-0 sm:w-[min(100%,380px)] lg:w-[420px] bg-black flex items-center justify-center rounded-lg border border-gray-600 shadow-md overflow-hidden"
                     >
                       {!isLoaded && (
                         <div className="absolute inset-0 flex items-center justify-center z-[5] pointer-events-none">
@@ -287,11 +436,11 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
                     onClick={() => {
                       if (isVideo) return;
                       const lbIndex = lightboxMedia.indexOf(media);
-                      if (lbIndex >= 0) setLightboxIndex(lbIndex);
+                      if (lbIndex >= 0) openLightbox(lbIndex);
                     }}
-                    className={`relative flex-shrink-0 h-64 bg-black flex items-center justify-center rounded-lg border border-gray-600 shadow-md overflow-hidden
+                    className={`relative w-full h-64 sm:flex-shrink-0 bg-black flex items-center justify-center rounded-lg border border-gray-600 shadow-md overflow-hidden
                       ${isVideo ? "cursor-default" : "cursor-pointer"}
-                      ${isPortrait ? "w-[180px] lg:w-[220px]" : "w-[250px] lg:w-[350px]"}
+                      ${isPortrait ? "sm:w-[180px] lg:w-[220px]" : "sm:w-[250px] lg:w-[350px]"}
                     `}
                   >
                     {!isLoaded && (
@@ -328,78 +477,9 @@ const PortfolioModal = ({ project, onClose }: { project: PortfolioProject; onClo
           </div>
         </div>
       </div>
-
-      {/* Fullscreen lightbox */}
-      {lightboxIndex !== null && (
-        <div
-          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 cursor-zoom-out"
-          onClick={() => setLightboxIndex(null)} // Clicking anywhere closes lightbox
-        >
-          {/* Close button for lightbox */}
-          <button onClick={(e) => { e.stopPropagation(); setLightboxIndex(null); }} className="absolute top-4 right-4 text-white text-3xl hover:text-green-400 z-50">
-            ×
-          </button>
-
-          {/* Left/Right arrows for lightbox */}
-          <button
-            disabled={lightboxMedia.length <= 1}
-            onClick={(e) => {
-              e.stopPropagation();
-              goLightboxLeft();
-            }}
-            className={`absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/70 text-white text-2xl rounded-full border border-white z-50 ${
-              lightboxMedia.length <= 1 ? "opacity-40 pointer-events-none" : "hover:bg-black"
-            }`}
-            aria-label="Previous image"
-          >
-            ‹
-          </button>
-          <button
-            disabled={lightboxMedia.length <= 1}
-            onClick={(e) => {
-              e.stopPropagation();
-              goLightboxRight();
-            }}
-            className={`absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-black/70 text-white text-2xl rounded-full border border-white z-50 ${
-              lightboxMedia.length <= 1 ? "opacity-40 pointer-events-none" : "hover:bg-black"
-            }`}
-            aria-label="Next image"
-          >
-            ›
-          </button>
-
-          {/* Centered image */}
-          {(() => {
-            const src = lightboxMedia[lightboxIndex];
-            const isRemote = /^https?:\/\//i.test(src);
-            return (
-              <>
-                {!lightboxLoaded && (
-                  <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
-                    <div className="h-10 w-10 rounded-full border-2 border-white/25 border-t-neon-green animate-spin" />
-                  </div>
-                )}
-                <Image
-                  src={src}
-                  alt=""
-                  width={1200}
-                  height={1200}
-                  unoptimized={isRemote}
-                  onLoad={() => setLightboxLoaded(true)}
-                  className={`object-contain transition-opacity duration-200 ${
-                    lightboxLoaded ? "opacity-100" : "opacity-0"
-                  } ${
-                    portraitSet.has(src)
-                      ? "max-h-[calc(100%-160px)]" // Add top/bottom margin for portrait
-                      : "max-h-full"
-                  }`}
-                />
-              </>
-            );
-          })()}
-        </div>
-      )}
     </div>
+    {typeof document !== "undefined" && lightbox ? createPortal(lightbox, document.body) : null}
+    </>
   );
 };
 

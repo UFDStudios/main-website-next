@@ -467,7 +467,8 @@ async function main() {
 
   const uploadCache = new Map<string, string>(); // publicUrl -> imagekitUrl
 
-  for (const p of portfolioData) {
+  for (let i = 0; i < portfolioData.length; i++) {
+    const p = portfolioData[i]!;
     const project = await prisma.project.create({
       data: {
         title: p.title,
@@ -475,6 +476,7 @@ async function main() {
         longDescription: p.longDescription,
         // will be replaced with ImageKit URL below
         mainImage: p.mainImage,
+        sortOrder: i,
       },
     });
 
