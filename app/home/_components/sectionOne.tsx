@@ -1,10 +1,11 @@
 import Reveal from "@/app/components/reveal"
 import Image from "next/image"
+import Link from "next/link"
 
 const SectionOne = () => {
   return (
-    <div className="w-full grid lg:grid-cols-2 mt-10">
-      <div className="flex flex-col text-center lg:mt-32 lg:p-14">
+    <div className="w-full grid lg:grid-cols-2">
+      <div className="flex flex-col text-center lg:p-14">
         <h1 className="text-foreground font-extrabold md:text-7xl text-4xl">
           <span className="text-neon-green">"</span>Full-Cycle
         </h1>
@@ -12,11 +13,24 @@ const SectionOne = () => {
         <h1 className="text-foreground font-extrabold md:text-7xl text-4xl">
           Development<span className="text-neon-green">"</span>
         </h1>
-        <p className="flex justify-start lg:text-left lg:px-20 text-foreground mt-20 text-2xl text-center px-5">
+        <p className="flex justify-start lg:text-left lg:px-20 text-foreground mt-13 text-2xl text-center px-5">
           With a track record of 250+ successful titles, UFD Studios provides studio-level
           execution for startups and funded teams. We turn ambitious concepts into global mobile
           hits.
         </p>
+        <div className="mt-8 flex justify-center lg:justify-start lg:px-20 px-5">
+          <Link
+            href="/contact"
+            className="inline-flex rounded-lg border-2 border-neon-green bg-black p-0.5 shadow-[0_0_20px_#39ff14] transition-shadow duration-300 hover:shadow-[0_0_28px_#39ff14]"
+          >
+            <span className="inline-flex items-center gap-4 rounded-lg border-2 border-black bg-white px-8 py-2.5 text-base font-bold text-black">
+              Book Free Call
+              <span className="text-lg leading-none" aria-hidden="true">
+                →
+              </span>
+            </span>
+          </Link>
+        </div>
       </div>
       <div className="relative justify-center items-center mr-10 hidden lg:flex">
         {/* Background Images */}

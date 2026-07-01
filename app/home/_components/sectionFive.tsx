@@ -8,7 +8,7 @@ const SectionFive = () => {
         alt="Workflow Diagram"
         width={1450}
         height={830}
-        className="max-w-full h-auto"
+        className="w-full max-w-4xl h-auto"
       />
     </div>
   )
