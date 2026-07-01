@@ -3,7 +3,7 @@ import Image from "next/image"
 const SectionTwo = () => {
   return (
     <div className="mt-8 mx-8">
-      <div className="flex text-center md:text-start lg:mt-32 lg:p-14">
+      <div className="flex text-center md:text-start px-14 pb-14 pt-0">
         <h1 className="text-foreground font-extrabold md:text-7xl text-4xl">
           <span className="text-neon-green">"</span>
           <span className="border-b-2 border-foreground">Our</span> <span className="text-neon-green">Games</span>
