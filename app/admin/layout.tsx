@@ -4,5 +4,9 @@ export const metadata = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <div className="text-foreground font-[Arial,Helvetica,sans-serif]">{children}</div>;
+  return (
+    <div data-admin className="text-foreground font-[Arial,Helvetica,sans-serif]">
+      {children}
+    </div>
+  );
 }

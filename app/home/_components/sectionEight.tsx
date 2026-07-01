@@ -35,7 +35,7 @@ const reviews: Review[] = [
     rating: 5,
     review:
       "Ammaz and his team exceeded all expectations yet again! Truly the best game developer on Fiverr. His attention to detail is outstanding, and while I was very particular about how I wanted the game to look and feel, he made sure to deliver exactly what I wanted.",
-    link: "https://www.fiverr.com/mpr5034",
+    link: "https://www.fiverr.com/ufd_studio",
     avatar: "/images/clientReview/mpr5034.webp",
   },
   {
@@ -44,8 +44,17 @@ const reviews: Review[] = [
     rating: 5,
     review:
       "Your amazing work is so incredible it takes my breath away. Meeting such an excellent partner like you at the start of the new year in 2026 feels like pure good fortune. I’d love for us to keep creating meaningful results together with great synergy moving forward.",
-    link: "https://www.fiverr.com/hugokwon",
+    link: "https://www.fiverr.com/ufd_studio",
     avatar: "/images/clientReview/hugokwon.webp",
+  },
+  {
+    name: "Rajesh Desaii",
+    role: "India",
+    rating: 5,
+    review:
+      "It was a great experience working with this developer. The Nut Sort game was completed professionally and all requested changes were implemented properly. Communication was smooth, updates were shared on time, and the developer was very supportive throughout the project.",
+    link: "https://www.upwork.com/freelancers/~01fafd10accb24f36b",
+    avatar: "/images/clientReview/rajeshDesai.png",
   },
   {
     name: "Julian N",
@@ -53,34 +62,34 @@ const reviews: Review[] = [
     rating: 5,
     review:
       "They delivered high-quality work on time and communicated clearly throughout the project. Would definitely recommend and hire again.",
-    link: "https://www.fiverr.com/juno_ger",
+    link: "https://www.fiverr.com/ufd_studio",
     avatar: "/images/clientReview/juno_ger.webp",
   },
   {
-    name: "luisguary",
+    name: "Luis Guary",
     role: "Colombia",
     rating: 5,
     review:
       "Working with ufd_studio has been an amazing experience. From the very beginning, he showed commitment, patience, and a genuine willingness to listen to every idea I had. The final result of the game exceeded my expectations.",
-    link: "https://www.fiverr.com/luisguary",
+    link: "https://www.fiverr.com/ufd_studio",
     avatar: "/images/clientReview/luisguary.webp",
   },
   {
-    name: "ashraffashion",
+    name: "Ashraf",
     role: "Germany",
     rating: 5,
     review:
       "You can find many service providers on Fivver. Some are just cheap and do their job. But there are other service providers who not only do their job, but you can see that they are 100% committed to the project. You don't find such gems very often.",
-    link: "https://www.fiverr.com/ashraffashion",
+    link: "https://www.fiverr.com/ufd_studio",
     avatar: "/images/clientReview/ashraffashion.webp",
   },
   {
-    name: "chrispilavides",
+    name: "hris Pilavides",
     role: "Cyprus",
     rating: 5,
     review:
       "Great team . Cooperative and always trying to deliver the best results .",
-    link: "https://www.fiverr.com/chrispilavides",
+    link: "https://www.fiverr.com/ufd_studio",
     avatar: "/images/clientReview/chrispilavides.webp",
   },
   {
@@ -89,7 +98,7 @@ const reviews: Review[] = [
     rating: 5,
     review:
       "Working with Ufd Studios was great! He fixed my issue super fast and was really easy to talk to. I'd highly recommend him!",
-    link: "https://www.fiverr.com/danielharangozo",
+    link: "https://www.fiverr.com/ufd_studio",
     avatar: "/images/clientReview/danielharangozo.webp",
   },
   {
@@ -98,18 +107,9 @@ const reviews: Review[] = [
     rating: 5,
     review:
       "Great work",
-    link: "https://www.fiverr.com/joshrennolds1",
-    avatar: "/images/clientReview/joshrennolds1.webp",
-  },
-  {
-    name: "Rajesh Desaii",
-    role: "India",
-    rating: 5,
-    review:
-      "It was a great experience working with this developer. The Nut Sort game was completed professionally and all requested changes were implemented properly. Communication was smooth, updates were shared on time, and the developer was very supportive throughout the project.",
     link: "https://www.fiverr.com/ufd_studio",
-    avatar: "/images/clientReview/rajeshDesai.png",
-  },
+    avatar: "/images/clientReview/joshrennolds1.webp",
+  }
 ]
 
 const useItemsPerView = () => {

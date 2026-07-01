@@ -68,6 +68,15 @@ body {
   overflow-x: hidden;
 }
 
+/* ~90% browser zoom: scales rem-based Tailwind sizing on public pages */
+html {
+  font-size: 90%;
+}
+
+html:has([data-admin]) {
+  font-size: 100%;
+}
+
 /* Disable scroll when modal open */
 body.modal-open {
   overflow: hidden !important;
