@@ -18,7 +18,7 @@ const SectionOne = () => {
           execution for startups and funded teams. We turn ambitious concepts into global mobile
           hits.
         </p>
-        <div className="mt-8 flex justify-center lg:justify-start lg:px-20 px-5">
+        <div className="mt-8 flex w-full justify-center px-5 lg:w-fit lg:self-center">
           <Link
             href="/contact"
             className="inline-flex rounded-lg border-2 border-neon-green bg-black p-0.5 shadow-[0_0_20px_#39ff14] transition-shadow duration-300 hover:shadow-[0_0_28px_#39ff14]"
@@ -34,7 +34,7 @@ const SectionOne = () => {
       </div>
       <div className="relative justify-center items-center mr-10 hidden lg:flex">
         {/* Background Images */}
-        <Image
+        {/* <Image
           src="/images/character/left.png"
           alt="Background Character Left"
           width={400}
@@ -47,7 +47,7 @@ const SectionOne = () => {
           width={400}
           height={600}
           className="absolute right-0 top-[40%] transform -translate-y-1/2 w-1/2 opacity-50"
-        />
+        /> */}
         {/* Foreground Image */}
         <Reveal>
           <Image
@@ -55,7 +55,7 @@ const SectionOne = () => {
             alt="Main Character"
             width={600}
             height={800}
-            className="relative w-[80%] z-10"
+            className="relative w-[80%] max-h-[580px] h-auto object-contain z-10"
             priority
           />
         </Reveal>
