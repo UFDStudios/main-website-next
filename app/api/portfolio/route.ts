@@ -1,39 +1,17 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { fetchPortfolioPage, parsePortfolioQuery, PORTFOLIO_CACHE_HEADERS } from "@/lib/portfolio-public";
 
 export const runtime = "nodejs";
+export const revalidate = 60;
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const projects = await prisma.project.findMany({
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-      include: {
-        genres: { include: { genre: true } },
-        media: { orderBy: { sortOrder: "asc" } },
-      },
-    });
-
-    return NextResponse.json(
-      projects.map((p) => ({
-        id: p.id,
-        title: p.title,
-        shortDescription: p.shortDescription,
-        longDescription: p.longDescription,
-        mainImage: p.mainImage,
-        youtubeUrl: p.youtubeUrl,
-        googlePlayLink: p.googlePlayLink,
-        appStoreLink: p.appStoreLink,
-        enableVideo: p.enableVideo,
-        genres: p.genres.map((g) => g.genre.name),
-        images: p.media.map((m) => m.url),
-      }))
-    );
+    const { page, limit, genre } = parsePortfolioQuery(new URL(request.url).searchParams);
+    const result = await fetchPortfolioPage(page, limit, genre);
+    return NextResponse.json(result, { headers: PORTFOLIO_CACHE_HEADERS });
   } catch (err) {
     console.error("[api/portfolio] GET failed", err);
-    const message =
-      err instanceof Error
-        ? err.message
-        : "Unknown error";
+    const message = err instanceof Error ? err.message : "Unknown error";
 
     return NextResponse.json(
       process.env.NODE_ENV === "production"
@@ -43,4 +21,3 @@ export async function GET() {
     );
   }
 }
-
