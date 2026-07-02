@@ -1,6 +1,6 @@
 const SectionFour = () => {
   return (
-    <div className="w-full mt-32">
+    <div className="w-full mt-15">
       <div className="flex flex-col items-center">
         <h1 className="text-foreground font-extrabold md:text-7xl text-4xl">
           <span className="text-neon-green">How</span> we work?

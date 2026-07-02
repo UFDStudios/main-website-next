@@ -1,8 +1,12 @@
 import Image from "next/image"
 
-const Logo = () => {
+interface LogoProps {
+  className?: string
+}
+
+const Logo = ({ className = "" }: LogoProps) => {
   return (
-    <div>
+    <div className={className}>
       <Image
         src="/images/Logo-Transparent.png"
         alt="UFD LOGO"

@@ -120,6 +120,22 @@ body.modal-open {
   animation: admin-dialog-scale-in 0.22s ease-out;
 }
 
+@keyframes footer-cta-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(255, 255, 255, 0.28);
+  }
+}
+
+@media (max-width: 767px) {
+  .footer-cta {
+    animation: footer-cta-pulse 2.8s ease-in-out infinite;
+  }
+}
+
 /* Rich text editor (admin) & rendered content (public) */
 .rich-text-editor-content,
 .rich-text-editor-body .ProseMirror,
