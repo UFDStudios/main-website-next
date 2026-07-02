@@ -17,7 +17,7 @@ const Careers = () => {
   return (
     <div className="bg-main" >
       {/* Employee Testimonials */}
-      <div className="w-full h-full text-white px-6 py-12 flex flex-col items-center mt-16">
+      <div className="w-full h-full text-white px-6 py-12 flex flex-col items-center">
         <h2 className="text-neon-green text-center text-5xl font-bold mb-12">
           " <span className="text-white">What</span> are Employees Saying? "
         </h2>

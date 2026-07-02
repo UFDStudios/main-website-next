@@ -189,7 +189,7 @@ const SectionEight = () => {
   const goNext = () => setPage((prev) => (prev === totalPages - 1 ? 0 : prev + 1))
 
   return (
-    <div className="w-full mt-32">
+    <div className="w-full mt-18">
       <div className="flex flex-col items-center text-center px-6">
         <h1 className="text-foreground font-extrabold md:text-7xl text-4xl">
           <span className="text-neon-green">Reviews &</span> Social Proof

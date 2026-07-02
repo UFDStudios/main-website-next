@@ -3,7 +3,7 @@ import Image from "next/image"
 
 const SectionSeven = () => {
   return (
-    <div className="grid md:grid-cols-2 grid-cols-1 mt-32">
+    <div className="grid md:grid-cols-2 grid-cols-1 mt-15">
       <div className="md:ml-32">
         <div className="flex space-x-5 items-center">
           <Image src="/images/contact/email.png" alt="Email Icon" width={60} height={60} className="p-3" />
