@@ -1,18 +1,7 @@
 import type { MediaKind, Prisma } from "@prisma/client";
+import type { PortfolioProject, PortfolioProjectSummary } from "@/app/components/portfolio/types";
 
-export type PortfolioApiProject = {
-  id: string;
-  title: string;
-  shortDescription: string;
-  longDescription: string;
-  mainImage: string;
-  youtubeUrl: string | null;
-  googlePlayLink: string | null;
-  appStoreLink: string | null;
-  enableVideo: boolean;
-  genres: string[];
-  images: string[];
-};
+export type PortfolioApiProject = PortfolioProject;
 
 type ProjectWithRelations = Prisma.ProjectGetPayload<{
   include: {
@@ -20,6 +9,32 @@ type ProjectWithRelations = Prisma.ProjectGetPayload<{
     media: true;
   };
 }>;
+
+type ProjectSummaryRow = Prisma.ProjectGetPayload<{
+  select: {
+    id: true;
+    title: true;
+    shortDescription: true;
+    mainImage: true;
+    youtubeUrl: true;
+    enableVideo: true;
+    genres: { select: { genre: { select: { name: true } } } };
+    _count: { select: { media: true } };
+  };
+}>;
+
+export function mapProjectSummaryToApi(project: ProjectSummaryRow): PortfolioProjectSummary {
+  return {
+    id: project.id,
+    title: project.title,
+    shortDescription: project.shortDescription,
+    mainImage: project.mainImage,
+    youtubeUrl: project.youtubeUrl,
+    enableVideo: project.enableVideo,
+    genres: project.genres.map((g) => g.genre.name),
+    mediaCount: project._count.media,
+  };
+}
 
 export function mapProjectToApi(project: ProjectWithRelations): PortfolioApiProject {
   return {
@@ -33,6 +48,7 @@ export function mapProjectToApi(project: ProjectWithRelations): PortfolioApiProj
     appStoreLink: project.appStoreLink,
     enableVideo: project.enableVideo,
     genres: project.genres.map((g) => g.genre.name),
+    mediaCount: project.media.length,
     images: project.media
       .slice()
       .sort((a, b) => a.sortOrder - b.sortOrder)

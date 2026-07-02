@@ -1,25 +1,57 @@
 "use client";
 
 import Image from "next/image";
-import { Key, useEffect, useMemo, useState } from "react";
+import { Key, useCallback, useEffect, useMemo, useState } from "react";
 import { getYouTubeEmbedSrc, isYouTubeUrl } from "@/lib/youtubeEmbed";
 import { stripRichText } from "@/app/components/RichTextContent";
-import type { PortfolioProject } from "./types";
+import type { PortfolioProjectSummary } from "./types";
 
-const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick: () => void }) => {
+const ProjectCard = ({
+  project,
+  onClick,
+}: {
+  project: PortfolioProjectSummary;
+  onClick: () => void;
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mediaLoading, setMediaLoading] = useState(true);
-  
-  const allMedia = useMemo(() => {
-    const combined = [project.mainImage, ...project.images];
-    const deduped = Array.from(new Set(combined));
-    const yt = project.youtubeUrl?.trim() && getYouTubeEmbedSrc(project.youtubeUrl)
-      ? project.youtubeUrl.trim()
-      : null;
-    if (!yt) return deduped;
-    // On the grid (modal closed): trailer first only when enableVideo; otherwise mainImage leads.
-    return project.enableVideo ? [yt, ...deduped] : [...deduped, yt];
-  }, [project.mainImage, project.images, project.youtubeUrl, project.enableVideo]);
+  const [extraImages, setExtraImages] = useState<string[]>([]);
+  const [loadingExtraMedia, setLoadingExtraMedia] = useState(false);
+
+  const loadExtraMedia = useCallback(async () => {
+    if (extraImages.length > 0 || project.mediaCount === 0 || loadingExtraMedia) return extraImages;
+
+    setLoadingExtraMedia(true);
+    try {
+      const res = await fetch(`/api/portfolio/${project.id}/media`);
+      if (!res.ok) return extraImages;
+      const data = (await res.json()) as { images?: string[] };
+      const images = Array.isArray(data.images) ? data.images : [];
+      setExtraImages(images);
+      return images;
+    } catch {
+      return extraImages;
+    } finally {
+      setLoadingExtraMedia(false);
+    }
+  }, [extraImages, loadingExtraMedia, project.id, project.mediaCount]);
+
+  const buildAllMedia = useCallback(
+    (images: string[]) => {
+      const combined = [project.mainImage, ...images];
+      const deduped = Array.from(new Set(combined.filter(Boolean)));
+      const yt = project.youtubeUrl?.trim() && getYouTubeEmbedSrc(project.youtubeUrl)
+        ? project.youtubeUrl.trim()
+        : null;
+      if (!yt) return deduped;
+      return project.enableVideo ? [yt, ...deduped] : [...deduped, yt];
+    },
+    [project.mainImage, project.youtubeUrl, project.enableVideo]
+  );
+
+  const allMedia = useMemo(() => buildAllMedia(extraImages), [buildAllMedia, extraImages]);
+
+  const canNavigateMedia = allMedia.length > 1 || project.mediaCount > 0;
 
   useEffect(() => {
     setCurrentIndex((i) => {
@@ -32,12 +64,22 @@ const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick:
     setMediaLoading(true);
   }, [currentIndex]);
 
-  const goLeft = () => {
-    setCurrentIndex((i) => (allMedia.length ? (i - 1 + allMedia.length) % allMedia.length : 0));
+  const goLeft = async () => {
+    let images = extraImages;
+    if (allMedia.length <= 1 && project.mediaCount > 0) {
+      images = await loadExtraMedia();
+    }
+    const media = buildAllMedia(images);
+    setCurrentIndex((i) => (media.length ? (i - 1 + media.length) % media.length : 0));
   };
 
-  const goRight = () => {
-    setCurrentIndex((i) => (allMedia.length ? (i + 1) % allMedia.length : 0));
+  const goRight = async () => {
+    let images = extraImages;
+    if (allMedia.length <= 1 && project.mediaCount > 0) {
+      images = await loadExtraMedia();
+    }
+    const media = buildAllMedia(images);
+    setCurrentIndex((i) => (media.length ? (i + 1) % media.length : 0));
   };
 
   const currentMedia = allMedia[currentIndex] || "";
@@ -58,13 +100,15 @@ const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick:
         <div className="relative w-full h-[220px] bg-black flex items-center justify-center">
           {/* Left Arrow */}
           <button
-            disabled={mediaLoading || allMedia.length <= 1}
+            disabled={!canNavigateMedia || mediaLoading || loadingExtraMedia}
             onClick={(e) => {
               e.stopPropagation();
-              goLeft();
+              void goLeft();
             }}
             className={`absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/70 text-white text-lg rounded-full border border-white z-10 ${
-              mediaLoading || allMedia.length <= 1 ? "opacity-40 pointer-events-none" : "hover:bg-black"
+              !canNavigateMedia || mediaLoading || loadingExtraMedia
+                ? "opacity-40 pointer-events-none"
+                : "hover:bg-black"
             }`}
             aria-label="Previous media"
           >
@@ -73,13 +117,15 @@ const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick:
 
           {/* Right Arrow */}
           <button
-            disabled={mediaLoading || allMedia.length <= 1}
+            disabled={!canNavigateMedia || mediaLoading || loadingExtraMedia}
             onClick={(e) => {
               e.stopPropagation();
-              goRight();
+              void goRight();
             }}
             className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/70 text-white text-lg rounded-full border border-white z-10 ${
-              mediaLoading || allMedia.length <= 1 ? "opacity-40 pointer-events-none" : "hover:bg-black"
+              !canNavigateMedia || mediaLoading || loadingExtraMedia
+                ? "opacity-40 pointer-events-none"
+                : "hover:bg-black"
             }`}
             aria-label="Next media"
           >
@@ -87,7 +133,7 @@ const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick:
           </button>
 
           {/* Loader overlay while switching media */}
-          {mediaLoading && (
+          {(mediaLoading || loadingExtraMedia) && (
             <div className="absolute inset-0 flex items-center justify-center z-[5] pointer-events-none">
               <div className="h-7 w-7 rounded-full border-2 border-white/25 border-t-neon-green animate-spin" />
             </div>
@@ -114,7 +160,7 @@ const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick:
                 mediaLoading ? "blur-sm" : "blur-0"
               }`}
             />
-          ) : (
+          ) : currentMedia ? (
             <Image
               src={currentMedia}
               alt={project.title}
@@ -126,7 +172,7 @@ const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick:
                 mediaLoading ? "blur-sm" : "blur-0"
               }`}
             />
-          )}
+          ) : null}
         </div>
 
         {/* Content */}
@@ -140,7 +186,7 @@ const ProjectCard = ({ project, onClick }: { project: PortfolioProject; onClick:
           </p>
 
           <div className="flex gap-3 flex-wrap">
-            {project.genres.map((genre: string , i: Key | null | undefined) => (
+            {project.genres.map((genre: string, i: Key | null | undefined) => (
               <span key={i} className="bg-black border border-gray-700 px-4 py-2 rounded-md text-white text-sm font-bold">
                 {genre}
               </span>
