@@ -37,7 +37,7 @@ const Careers = () => {
             </div>
             <h3 className="font-bold mt-4 text-2xl">Great place to work</h3>
             <p className="text-gray-300 text-xl">
-              As told by 99% of our employees worldwide
+              As told by 91% of our employees worldwide
             </p>
           </div>
           <div>

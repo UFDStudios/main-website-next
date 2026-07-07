@@ -147,7 +147,7 @@ const AboutUs = () => {
       <div className="mt-0 mb-4 lg:mt-0 lg:mb-5 flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 lg:gap-14 text-center">
         <div>
           <h3 className="text-2xl lg:text-4xl font-bold">
-            5<span className="text-neon-green">+</span>
+            6<span className="text-neon-green">+</span>
           </h3>
           <p className="text-gray-400 text-xs lg:text-sm font-bold">
             Years of excellence
@@ -163,10 +163,18 @@ const AboutUs = () => {
         </div>
         <div>
           <h3 className="text-2xl lg:text-4xl font-bold">
-            500<span className="text-neon-green">+</span>
+            250<span className="text-neon-green">+</span>
           </h3>
           <p className="text-gray-400 text-xs lg:text-sm font-bold">
             Projects completed
+          </p>
+        </div>
+        <div>
+          <h3 className="text-2xl lg:text-4xl font-bold">
+            100<span className="text-neon-green">+</span>
+          </h3>
+          <p className="text-gray-400 text-xs lg:text-sm font-bold">
+            Happy Clients
           </p>
         </div>
       </div>

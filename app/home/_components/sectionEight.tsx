@@ -84,7 +84,7 @@ const reviews: Review[] = [
     avatar: "/images/clientReview/ashraffashion.webp",
   },
   {
-    name: "hris Pilavides",
+    name: "Chris Pilavides",
     role: "Cyprus",
     rating: 5,
     review:

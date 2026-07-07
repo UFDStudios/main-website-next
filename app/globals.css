@@ -92,6 +92,20 @@ body.modal-open {
   -ms-overflow-style: none;
 }
 
+@keyframes stats-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.stats-marquee-track {
+  animation: stats-marquee 28s linear infinite;
+  will-change: transform;
+}
+
 @keyframes admin-dialog-fade-in {
   from {
     opacity: 0;
