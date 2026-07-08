@@ -138,13 +138,3 @@ const SectionOne = () => {
 }
 
 export default SectionOne
-
-
-
-
-/* - Each section should fit in whole web view, right now some sections are bigger and 
-  some are smaller. (Cutting off the screen)
-- In Careers section, the text is overlapping
-- In portfolio, give high priority to the following tags (All, 2D, 3D, Multiplayer, Puzzle, Shooting, Racing)
-- In Review section, display the scroll arrow left and right instead of showing at the bottom.
-- Don’t display menu text in mobile view. (https://kevurugames.com/game-development/) */
