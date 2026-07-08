@@ -5,6 +5,7 @@ import { useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { FaTimes } from "react-icons/fa"
+import Logo from "../logo"
 
 interface SidebarProps {
   isOpen: boolean
@@ -47,15 +48,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, links }) => {
       />
 
       <aside
-        className={`fixed top-0 right-0 z-[70] flex h-dvh w-[min(18rem,85vw)] flex-col bg-black shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed inset-0 z-[70] flex h-dvh w-full flex-col bg-black shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         aria-hidden={!isOpen}
       >
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-5">
-          <p className="text-lg font-semibold text-white">
-            <span className="text-neon-green">"</span>Menu<span className="text-neon-green">"</span>
-          </p>
+          <Logo />
           <button
             type="button"
             onClick={toggleSidebar}

@@ -14,6 +14,7 @@
   --color-neon-green: var(--neon-green);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --breakpoint-3xl: 120rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -90,6 +91,37 @@ body.modal-open {
 .scrollbar-hide {
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+@keyframes stats-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.stats-marquee-track {
+  animation: stats-marquee 28s linear infinite;
+  will-change: transform;
+}
+
+.stats-marquee-mask {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 2.5rem,
+    black calc(100% - 2.5rem),
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 2.5rem,
+    black calc(100% - 2.5rem),
+    transparent
+  );
 }
 
 @keyframes admin-dialog-fade-in {

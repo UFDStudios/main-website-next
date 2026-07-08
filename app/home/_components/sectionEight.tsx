@@ -84,7 +84,7 @@ const reviews: Review[] = [
     avatar: "/images/clientReview/ashraffashion.webp",
   },
   {
-    name: "hris Pilavides",
+    name: "Chris Pilavides",
     role: "Cyprus",
     rating: 5,
     review:
@@ -200,55 +200,55 @@ const SectionEight = () => {
       </div>
 
       <div className="mx-auto mt-16 max-w-7xl px-6">
-        <div className="overflow-hidden">
-          <div
-            className="flex transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateX(-${page * 100}%)` }}
-          >
-            {reviews.map((review, i) => (
-              <div
-                key={i}
-                className="shrink-0 px-4"
-                style={{ width: `${100 / itemsPerView}%` }}
-              >
-                <ReviewCard review={review} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-12 flex items-center justify-center gap-6">
+        <div className="flex items-center gap-4 md:gap-6">
           <button
             type="button"
             onClick={goPrev}
             aria-label="Previous reviews"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-foreground transition-colors duration-300 hover:border-neon-green hover:text-neon-green"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 text-foreground transition-colors duration-300 hover:border-neon-green hover:text-neon-green md:h-12 md:w-12"
           >
             <FiChevronLeft className="text-2xl" />
           </button>
 
-          <div className="flex items-center gap-2">
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setPage(i)}
-                aria-label={`Go to slide ${i + 1}`}
-                className={`h-2.5 rounded-full transition-all duration-300 ${
-                  i === page ? "w-8 bg-neon-green" : "w-2.5 bg-white/30 hover:bg-white/50"
-                }`}
-              />
-            ))}
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <div
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ transform: `translateX(-${page * 100}%)` }}
+            >
+              {reviews.map((review, i) => (
+                <div
+                  key={i}
+                  className="shrink-0 px-4"
+                  style={{ width: `${100 / itemsPerView}%` }}
+                >
+                  <ReviewCard review={review} />
+                </div>
+              ))}
+            </div>
           </div>
 
           <button
             type="button"
             onClick={goNext}
             aria-label="Next reviews"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-foreground transition-colors duration-300 hover:border-neon-green hover:text-neon-green"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 text-foreground transition-colors duration-300 hover:border-neon-green hover:text-neon-green md:h-12 md:w-12"
           >
             <FiChevronRight className="text-2xl" />
           </button>
+        </div>
+
+        <div className="mt-12 flex items-center justify-center gap-2">
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setPage(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`h-2.5 rounded-full transition-all duration-300 ${
+                i === page ? "w-8 bg-neon-green" : "w-2.5 bg-white/30 hover:bg-white/50"
+              }`}
+            />
+          ))}
         </div>
       </div>
     </div>

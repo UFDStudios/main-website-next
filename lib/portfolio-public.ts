@@ -7,6 +7,23 @@ export const PORTFOLIO_CACHE_HEADERS = {
   "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
 };
 
+/** Genres shown first in the portfolio filter bar (after "All"). */
+export const PORTFOLIO_PRIORITY_GENRES = [
+  "2D",
+  "3D",
+  "Multiplayer",
+  "Puzzle",
+  "Shooting",
+  "Racing",
+] as const;
+
+function portfolioGenrePriorityIndex(name: string) {
+  const index = PORTFOLIO_PRIORITY_GENRES.indexOf(
+    name as (typeof PORTFOLIO_PRIORITY_GENRES)[number]
+  );
+  return index >= 0 ? index : PORTFOLIO_PRIORITY_GENRES.length;
+}
+
 const projectListSelect = {
   id: true,
   title: true,
@@ -88,7 +105,15 @@ export async function fetchPortfolioGenres() {
 
   const sorted = genres
     .filter((g) => g._count.projects > 0)
-    .sort((a, b) => b._count.projects - a._count.projects || a.name.localeCompare(b.name))
+    .sort((a, b) => {
+      const priorityA = portfolioGenrePriorityIndex(a.name);
+      const priorityB = portfolioGenrePriorityIndex(b.name);
+      if (priorityA !== priorityB) return priorityA - priorityB;
+      if (priorityA === PORTFOLIO_PRIORITY_GENRES.length) {
+        return b._count.projects - a._count.projects || a.name.localeCompare(b.name);
+      }
+      return 0;
+    })
     .map((g) => g.name);
 
   return ["All", ...sorted];
