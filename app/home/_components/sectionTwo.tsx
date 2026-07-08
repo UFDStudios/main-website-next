@@ -8,15 +8,6 @@ const GAME_IMAGES = Array.from({ length: 11 }, (_, index) => ({
   alt: `Game ${index + 1}`,
 }))
 
-const headerVariants: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut" },
-  },
-}
-
 const galleryVariants: Variants = {
   hidden: {},
   visible: {
@@ -69,16 +60,10 @@ function GameCard({
 
 const SectionTwo = () => {
   return (
-    <div className="mt-18 px-[clamp(1.25rem,5vw,3.5rem)] lg:mt-24 xl:mt-28">
+    <div className="px-[clamp(1.25rem,5vw,3.5rem)] lg:mt-24 xl:mt-8">
       <div className="flex flex-col items-center gap-8 lg:gap-10">
         {/* Heading + description */}
-        <motion.div
-          className="flex w-full max-w-2xl flex-col text-center"
-          variants={headerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
-        >
+        <div className="flex w-full max-w-2xl flex-col text-center">
           <h1 className="text-foreground text-4xl font-extrabold md:text-7xl">
             <span className="text-neon-green">"</span>
             <span className="border-b-2 border-foreground">Our</span>{" "}
@@ -90,7 +75,7 @@ const SectionTwo = () => {
             across Unity, Unreal, and Godot demonstrate mastery in player engagement and
             scalable LiveOps strategies.
           </p>
-        </motion.div>
+        </div>
 
         {/* Game gallery — full width with fluid side padding from parent */}
         <motion.div
