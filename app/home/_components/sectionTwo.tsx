@@ -78,7 +78,7 @@ const SectionTwo = () => {
 
         {/* Game gallery — matches sample bento layout */}
         <motion.div
-          className={`mx-auto flex w-full max-w-[610px] flex-col xl:max-w-[710px] ${GALLERY_GAP}`}
+          className={`mx-auto flex w-full max-w-[850px] flex-col xl:max-w-[950px] ${GALLERY_GAP}`}
           variants={galleryVariants}
           initial="hidden"
           whileInView="visible"
