@@ -15,17 +15,27 @@ type Review = {
   countryCode?: string
 }
 
-const toFlagEmoji = (countryCode: string) =>
-  countryCode
-    .toUpperCase()
-    .replace(/[^A-Z]/g, "")
-    .slice(0, 2)
-    .split("")
-    .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
-    .join("")
-
 const resolveCountryCode = (review: Review) =>
   review.countryCode?.toUpperCase() ?? COUNTRY_NAME_TO_CODE[review.role]
+
+/** Image-based flags — emoji regional indicators often render as letters on Windows. */
+const CountryFlag = ({ code }: { code: string }) => {
+  const iso = code.toLowerCase().replace(/[^a-z]/g, "").slice(0, 2)
+  if (!iso) return null
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`https://flagcdn.com/24x18/${iso}.png`}
+      srcSet={`https://flagcdn.com/48x36/${iso}.png 2x`}
+      width={24}
+      height={18}
+      alt=""
+      className="inline-block h-[14px] w-[20px] rounded-[2px] object-cover"
+      loading="lazy"
+    />
+  )
+}
 
 // Placeholder data – swap these out with real client reviews later.
 const reviews: Review[] = [
@@ -102,13 +112,31 @@ const reviews: Review[] = [
     avatar: "/images/clientReview/danielharangozo.webp",
   },
   {
-    name: "Josh Rennolds",
+    name: "Talaamiya",
     role: "United Kingdom",
     rating: 5,
     review:
-      "Great work",
+      "Did a great job on the game, went above and beyond and made it better then I had asked for. Listened to everything I needed and made sure I was happy with everything, will definitely be using again was great working with him!",
     link: "https://www.fiverr.com/ufd_studio",
-    avatar: "/images/clientReview/joshrennolds1.webp",
+    avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+  },
+  {
+    name: "Aivarsslis",
+    role: "Latvia",
+    rating: 5,
+    review:
+      "Created a high-quality 3D model with great retro-style textures. Communication was clear, proactive, and easy throughout the process. ",
+    link: "https://www.fiverr.com/ufd_studio",
+    avatar: "https://randomuser.me/api/portraits/men/22.jpg",
+  },
+  {
+    name: "Lorenti",
+    role: "Kosovo",
+    rating: 5,
+    review:
+      "I had the pleasure of working with Ammaz and I can confidently say he did an outstanding job! Professional, reliable, and highly detail-oriented. Everything was completed with top quality and within the agreed timeframe.",
+    link: "https://www.fiverr.com/ufd_studio",
+    avatar: "https://randomuser.me/api/portraits/men/4.jpg",
   }
 ]
 
@@ -155,8 +183,8 @@ const ReviewCard = ({ review }: { review: Review }) => {
       <h3 className="mt-5 text-xl font-bold text-foreground">{review.name}</h3>
       <p className="mt-1 flex items-center justify-center gap-2 text-sm text-gray-400">
         {countryCode && (
-          <span className="text-base leading-none" aria-hidden="true">
-            {toFlagEmoji(countryCode)}
+          <span className="leading-none" aria-hidden="true">
+            <CountryFlag code={countryCode} />
           </span>
         )}
         <span>{review.role}</span>

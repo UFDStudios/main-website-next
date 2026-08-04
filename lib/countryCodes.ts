@@ -42,4 +42,6 @@ export const COUNTRY_NAME_TO_CODE: Record<string, string> = {
   "Colombia": "CO",
   "Chile": "CL",
   "Latvia": "LV",
+  "Kosovo": "XK",
+  "Cyprus": "CY",
 }

@@ -36,6 +36,9 @@ const PortfolioModal = ({
   }, [project.mainImage, project.images]);
   const containerRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  // Bumped whenever gallery media resets so stale cached onLoad events are ignored.
+  const mediaEpochRef = useRef(0);
+  const lightboxImgRef = useRef<HTMLImageElement | null>(null);
 
   // Orientation is tracked by media URL (not by array index) so that re-ordering
   // the gallery never causes flags to be written into the wrong slot.
@@ -60,14 +63,63 @@ const PortfolioModal = ({
     containerRef.current?.scrollTo({ left: 0, behavior: "auto" });
   }, [project.id]);
 
+  const applyImageMeta = useCallback((media: string, img: HTMLImageElement, epoch: number) => {
+    // Ignore events from a previous gallery generation (cached mainImage often
+    // fires onLoad before the reset effect below, then again we must re-apply).
+    if (epoch !== mediaEpochRef.current) return;
+    if (!img.naturalWidth && !img.naturalHeight) return;
+
+    const isLandscape = img.naturalWidth > img.naturalHeight;
+    setOrientations((prev) => {
+      if (prev[media] === isLandscape) return prev;
+      return { ...prev, [media]: isLandscape };
+    });
+    setLoadedMedia((prev) => {
+      if (prev.has(media)) return prev;
+      const next = new Set(prev);
+      next.add(media);
+      return next;
+    });
+  }, []);
+
   useEffect(() => {
+    mediaEpochRef.current += 1;
+    const epoch = mediaEpochRef.current;
     setOrientations({});
     setLoadedMedia(new Set());
-  }, [images, project.youtubeUrl]);
+
+    // Cached images (especially mainImage from the card) may have already fired
+    // onLoad before this reset — and won't fire again. Re-read complete nodes
+    // after paint so the gallery doesn't stay stuck on the spinner at opacity-0.
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        const root = containerRef.current;
+        if (!root) return;
+        root.querySelectorAll<HTMLElement>("[data-portfolio-media]").forEach((el) => {
+          const media = el.dataset.portfolioMedia;
+          if (!media) return;
+          const img =
+            el instanceof HTMLImageElement ? el : el.querySelector("img");
+          if (!img?.complete) return;
+          applyImageMeta(media, img, epoch);
+        });
+      });
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      if (raf2) cancelAnimationFrame(raf2);
+    };
+  }, [images, project.youtubeUrl, applyImageMeta]);
 
   // Reset lightbox loader whenever the active lightbox image changes.
   useEffect(() => {
     setLightboxLoaded(false);
+    const img = lightboxImgRef.current;
+    if (img?.complete && (img.naturalWidth || img.naturalHeight)) {
+      const raf = requestAnimationFrame(() => setLightboxLoaded(true));
+      return () => cancelAnimationFrame(raf);
+    }
   }, [lightboxIndex]);
 
   // Keep fullscreen image in the viewport (modal overlay is scrollable on mobile).
@@ -86,13 +138,7 @@ const PortfolioModal = ({
   };
 
   const handleImageLoad = (media: string, e: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = e.target as HTMLImageElement;
-    const isLandscape = img.naturalWidth > img.naturalHeight;
-    setOrientations(prev => {
-      if (prev[media] === isLandscape) return prev;
-      return { ...prev, [media]: isLandscape };
-    });
-    markMediaLoaded(media);
+    applyImageMeta(media, e.currentTarget, mediaEpochRef.current);
   };
 
   // Group by orientation. Memoized so the array identity is stable across
@@ -241,6 +287,12 @@ const PortfolioModal = ({
                 </div>
               )}
               <Image
+                ref={(node) => {
+                  lightboxImgRef.current = node;
+                  if (node?.complete && (node.naturalWidth || node.naturalHeight)) {
+                    setLightboxLoaded(true);
+                  }
+                }}
                 src={src}
                 alt=""
                 width={1200}
@@ -433,6 +485,7 @@ const PortfolioModal = ({
                 return (
                   <div
                     key={entry.key}
+                    data-portfolio-media={isVideo ? undefined : media}
                     onClick={() => {
                       if (isVideo) return;
                       const lbIndex = lightboxMedia.indexOf(media);
