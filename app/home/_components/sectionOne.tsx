@@ -123,12 +123,13 @@ const SectionOne = () => {
           />
           <Reveal>
             <Image
-              src="/images/character/main.png"
+              src="/images/character/main_animation.gif"
               alt="Main Character"
               width={600}
               height={800}
               className="relative z-10 h-auto max-h-[580px] w-[100%] object-contain xl:max-h-[640px] 2xl:max-h-[680px] 3xl:max-h-[720px]"
               priority
+              unoptimized
             />
           </Reveal>
         </div>
